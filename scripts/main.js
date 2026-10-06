@@ -591,7 +591,16 @@
 
       mv.addEventListener('error', () => {
         loadingOverlay.classList.add('archive-model-loading--error');
-        if (textEl) textEl.textContent = '加载失败，请检查网络';
+        if (textEl) textEl.textContent = '加载失败 · 请检查网络';
+        // 显示 SVG 占位（CDN 挂了的时候会很常见）
+        const itemKey = item.dataset.item || '';
+        const ph = document.createElement('div');
+        ph.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,12,16,0.6);z-index:1;';
+        ph.innerHTML = `
+          <img src="assets/images/item-${itemKey}.svg" alt="${itemKey}" style="max-width:60%;max-height:60%;filter:drop-shadow(0 16px 40px rgba(0,0,0,0.6));">
+        `;
+        loadingOverlay.parentNode?.insertBefore(ph, loadingOverlay);
+        loadingOverlay.style.display = 'none';
       }, { once: true });
 
       // 把 ph 替换成一个 slot div，里面包含 [loadingOverlay, mv]
@@ -701,22 +710,11 @@
   // ============================================================
   function bindSea() {
     // BGM 音频元素（sea-ambient.mp3）作为全站背景音乐
-    // CDN 优先，本地兜底；都不通则移除元素
-    // 视频播放时由 video-stage.js 调 duckBGM() 淡出；视频结束后恢复
+    // CDN 被暂停了（403），暂时直接用本地（git 里自带）
     const bgm = $('#bgmAudio');
     if (bgm) {
-      const candidates = [
-        'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/sea-ambient.mp3',
-        'assets/audio/sea-ambient.mp3'
-      ];
-      pickWorkingAudio(candidates).then(working => {
-        if (working) {
-          try { bgm.src = working; } catch (_) {}
-          bgm.load();
-        } else {
-          bgm.remove();
-        }
-      });
+      try { bgm.src = 'assets/audio/sea-ambient.mp3'; } catch (_) {}
+      bgm.load();
     }
   }
 

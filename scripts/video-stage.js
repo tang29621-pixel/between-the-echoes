@@ -26,19 +26,19 @@
 
   root.Echo.VideoStage = {
     // 8 个视频源配置（含钩子、3 段短片、写信背景、长椅、海边纸条、彩蛋）
-    // 每个 key 都配两个 URL：src = CDN 优先；fallback = 本地兜底
-    // preflight 时按顺序 HEAD，取第一个可达的；都不可达则记 null
+    // CDN 被暂停了（403），暂时全部走本地文件；本地已在 git 里，部署自带
+    // src = 当前用；fallback = 备用（其实都是同一个本地路径）
     config: {
-      hook:      { selector: '#videoHook',     src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BC%80%E5%A4%B4-27%E7%A7%92.mp4',     fallback: 'assets/video/开头-27秒.mp4',     contentEnd: 26.5, label: '前情' },
-      shortA:    { selector: '#videoA',        src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BC%80%E7%AE%B1-29.mp4',               fallback: 'assets/video/开箱-29.mp4',       contentEnd: 28.5, label: '《没有出发的星期日》' },
-      shortB:    { selector: '#videoB',        src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/ai%E9%AA%8C%E7%AE%97.mp4',                fallback: 'assets/video/ai验算.mp4',        contentEnd: 19.5, label: '《想象中的抵达》' },
-      shortC:    { selector: '#videoC',        src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E7%A9%BA%E6%A4%85%E5%AD%90.mp4',         fallback: 'assets/video/空椅子.mp4',        contentEnd: 2.5,  label: '《带你认识他》' },
-      letterBg:  { selector: '#letterBgVideo', src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E7%A9%BA%E6%A4%85%E5%AD%90.mp4',         fallback: 'assets/video/空椅子.mp4',        /* 写信背景循环，无结束卡 */ },
-      bench:     { selector: '#benchPlayer',   src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E9%99%88%E9%BB%98%E7%9A%84%E5%9B%9E%E4%BF%A1-14.mp4',  fallback: 'assets/video/陈默的回信-14.mp4',  contentEnd: 14,   label: '陈默的回信',
+      hook:      { selector: '#videoHook',     src: 'assets/video/开头-27秒.mp4',     fallback: 'assets/video/开头-27秒.mp4',     contentEnd: 26.5, label: '前情' },
+      shortA:    { selector: '#videoA',        src: 'assets/video/开箱-29.mp4',       fallback: 'assets/video/开箱-29.mp4',       contentEnd: 28.5, label: '《没有出发的星期日》' },
+      shortB:    { selector: '#videoB',        src: 'assets/video/ai验算.mp4',        fallback: 'assets/video/ai验算.mp4',        contentEnd: 19.5, label: '《想象中的抵达》' },
+      shortC:    { selector: '#videoC',        src: 'assets/video/空椅子.mp4',        fallback: 'assets/video/空椅子.mp4',        contentEnd: 2.5,  label: '《带你认识他》' },
+      letterBg:  { selector: '#letterBgVideo', src: 'assets/video/空椅子.mp4',        fallback: 'assets/video/空椅子.mp4',        /* 写信背景循环，无结束卡 */ },
+      bench:     { selector: '#benchPlayer',   src: 'assets/video/陈默的回信-14.mp4',  fallback: 'assets/video/陈默的回信-14.mp4',  contentEnd: 14,   label: '陈默的回信',
                    placeholderTitle: '长椅 · 爸，我到了', placeholderBadge: 'AI 推演', placeholderColor: '#8a9ac8' },
-      seaNote:   { selector: '#benchPlayer',   src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E9%99%88%E9%BB%98%E4%B8%8E%E5%A5%B3%E5%84%BF.mp4',  fallback: 'assets/video/陈默与女儿.mp4',     contentEnd: 23,   label: '陈默与女儿',
+      seaNote:   { selector: '#benchPlayer',   src: 'assets/video/陈默与女儿.mp4',     fallback: 'assets/video/陈默与女儿.mp4',     contentEnd: 23,   label: '陈默与女儿',
                    placeholderTitle: '陈默与女儿',     placeholderBadge: '本地兜底', placeholderColor: '#c8a8e0' },
-      easter:    { selector: '#easterPlayer',  src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BD%A9%E8%9B%8B.mp4',                fallback: 'assets/video/彩蛋.mp4',          contentEnd: 19.5, label: '彩蛋',
+      easter:    { selector: '#easterPlayer',  src: 'assets/video/彩蛋.mp4',          fallback: 'assets/video/彩蛋.mp4',          contentEnd: 19.5, label: '彩蛋',
                    placeholderTitle: '彩蛋 · 父亲留下的另一段记录', placeholderBadge: '本地兜底', placeholderColor: '#c8a8e0' }
     },
 
