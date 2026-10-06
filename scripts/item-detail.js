@@ -10,8 +10,9 @@
   'use strict';
   root.Echo = root.Echo || {};
 
-  // 物品 key → CDN URL
+  // 物品 key → CDN URL（_compressed.glb 是 Draco 压缩版，~2-5x 小，model-viewer 自带 decoder）
   const MODEL_BASE_URL = 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com';
+  const MODEL_PATH = (key) => `${MODEL_BASE_URL}/${key}_compressed.glb`;
 
   root.Echo.ItemDetail = {
     _currentItem: null,
@@ -70,7 +71,7 @@
         requestAnimationFrame(() => {
           const mv = document.createElement('model-viewer');
           mv.className = 'item-detail__model-viewer';
-          mv.setAttribute('src', `${MODEL_BASE_URL}/${itemKey}.glb`);
+          mv.setAttribute('src', MODEL_PATH(itemKey));
           mv.setAttribute('camera-controls', '');
           mv.setAttribute('auto-rotate', '');
           mv.setAttribute('auto-rotate-delay', '300');

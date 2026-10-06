@@ -536,7 +536,10 @@
       if (!ph || !ph.dataset.modelSrc) return;
       const mv = document.createElement('model-viewer');
       mv.className = 'item__media';
+      // ★ src 已是 HTML 里的 _compressed.glb（Draco 压缩版，2-5x 小），
+      //   模型查看器自带 Draco decoder，不用额外配置
       mv.setAttribute('src', ph.dataset.modelSrc);
+      const itemKey = item.dataset.item || '';
       mv.setAttribute('alt', item.dataset.item || '');
       mv.setAttribute('camera-controls', '');
       // loading=eager：元素一进 DOM 就开始下载（不靠视口触发）
@@ -553,7 +556,6 @@
 
       // 进度提示：把当前 item 替换成「加载中」overlay，下载完再替换回 model-viewer
       // 这样用户在 archive 也能看到下载进度
-      const itemKey = item.dataset.item || '';
       const loadingOverlay = document.createElement('div');
       loadingOverlay.className = 'archive-model-loading';
       loadingOverlay.innerHTML = `
@@ -974,6 +976,7 @@
     }
 
     // preload 4 个 GLB（并行下载，CDN 已开启 Accept-Ranges + 30 天缓存）
+    // 用 _compressed.glb（Draco 压缩版，~2-5x 小），model-viewer 自带 Draco decoder
     const models = [
       { name: 'painting', priority: 'high' }, // 第一件物品最高优先级
       { name: 'ticket',   priority: 'auto' },
@@ -981,7 +984,8 @@
       { name: 'letter',   priority: 'low' }
     ];
     models.forEach(({ name, priority }) => {
-      const url = `${HREF}/${name}.glb`;
+      // ★ 用 _compressed.glb（Draco 压缩版，2-5x 小），model-viewer 自带 Draco decoder
+      const url = `${HREF}/${name}_compressed.glb`;
       if (document.querySelector(`link[href="${url}"]`)) return;
       const link = document.createElement('link');
       link.rel = 'preload';
