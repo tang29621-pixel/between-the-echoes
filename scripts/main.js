@@ -582,7 +582,9 @@
 
       mv.addEventListener('load', () => {
         mv.style.opacity = '1';
-        if (loadingOverlay.parentNode) loadingOverlay.remove();
+        // ★ 不要 loadingOverlay.remove()——mv 是它的子元素，
+        //   remove() 会把 mv 一起删掉。改成只 display:none
+        loadingOverlay.style.display = 'none';
         mv.removeEventListener('progress', () => {});
       }, { once: true });
 
@@ -591,8 +593,9 @@
         if (textEl) textEl.textContent = '加载失败，请检查网络';
       }, { once: true });
 
-      ph.replaceWith(loadingOverlay);
-      loadingOverlay.appendChild(mv);
+      // 把 ph 替换成 [loadingOverlay + mv] 两个并列节点
+      // 这样 overlay 隐藏不影响 mv
+      ph.replaceWith(loadingOverlay, mv);
       // 启用 model-viewer 自带的 auto-rotate：每秒 16°，延迟 300ms 立即开始
       mv.setAttribute('auto-rotate', '');
       mv.setAttribute('auto-rotate-delay', '300');
