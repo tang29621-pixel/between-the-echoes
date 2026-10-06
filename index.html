@@ -43,6 +43,7 @@
         <button class="video__skip" data-skip="hook">跳过 →</button>
         <video class="video__player" id="videoHook"
                src="assets/video/开头-27秒.mp4"
+               crossorigin="anonymous"
                playsinline
                preload="metadata"></video>
         <div class="video__overlay" id="videoHookOverlay">
@@ -129,6 +130,7 @@
         <button class="video__skip" data-skip="shortA">跳过 →</button>
         <video class="video__player" id="videoA"
                src="assets/video/开箱-29.mp4"
+               crossorigin="anonymous"
                playsinline
                preload="metadata"></video>
         <div class="video__overlay" id="videoAOverlay">
@@ -343,6 +345,7 @@
         <button class="video__skip" data-skip="shortB">跳过 →</button>
         <video class="video__player" id="videoB"
                src="assets/video/ai验算.mp4"
+               crossorigin="anonymous"
                playsinline
                preload="metadata"></video>
         <div class="video__overlay" id="videoBOverlay">
@@ -453,6 +456,7 @@
         <button class="video__skip" data-skip="shortC">跳过 →</button>
         <video class="video__player" id="videoC"
                src="assets/video/空椅子.mp4"
+               crossorigin="anonymous"
                playsinline
                preload="metadata"></video>
         <div class="video__overlay" id="videoCOverlay">
@@ -493,6 +497,7 @@
     <section class="chapter chapter--write" id="chapter-9" data-chapter="write" hidden>
       <video class="write__bg-video" id="letterBgVideo"
              src="assets/video/空椅子.mp4"
+             crossorigin="anonymous"
              muted loop playsinline preload="metadata"></video>
       <div class="write__wrap">
         <p class="write__prompt">此刻，你想对谁说点什么？<span class="text__en">Whom would you like to speak to?</span></p>
@@ -645,6 +650,7 @@
     <div class="sea-overlay__backdrop" data-close="seaOverlay"></div>
     <video class="sea-overlay__player" id="benchPlayer"
            src="assets/video/陈默的回信-14.mp4"
+           crossorigin="anonymous"
            playsinline
            preload="metadata"></video>
 
@@ -668,6 +674,7 @@
     <div class="easter-overlay__backdrop" data-close="easterOverlay"></div>
     <video class="easter-overlay__player" id="easterPlayer"
            src="assets/video/彩蛋.mp4"
+           crossorigin="anonymous"
            playsinline preload="metadata"></video>
     <div class="easter-overlay__controls">
       <button class="easter-overlay__close" data-close="easterOverlay" aria-label="关闭">×</button>
@@ -677,7 +684,8 @@
   <!-- 模块脚本（按依赖顺序加载） -->
   <!-- model-viewer 是自包含的（自带 three），直接加载 -->
   <script type="module" src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/model-viewer.min.js"></script>
-  <script defer src="scripts/source-labels.js"></script>
+  <!-- 加 ?v= 日期戳让浏览器每次部署都能拿到新 JS（绕开之前 1 年的 immutable 缓存） -->
+  <script defer src="scripts/source-labels.js?v=20251006b"></script>
   <!-- 启动 splash：Chrome autoplay 政策要求用户首次手势才能有声音 -->
   <!-- 用户点击 splash 后立即解锁 BGM + 进入首页体验 -->
   <div class="start-splash" id="startSplash">
@@ -693,9 +701,9 @@
     </div>
   </div>
 
-  <script defer src="scripts/video-stage.js"></script>
-  <script defer src="scripts/item-detail.js"></script>
-  <script defer src="scripts/sea-scene.js"></script>
-  <script defer src="scripts/main.js"></script>
+  <script defer src="scripts/video-stage.js?v=20251006b"></script>
+  <script defer src="scripts/item-detail.js?v=20251006b"></script>
+  <script defer src="scripts/sea-scene.js?v=20251006b"></script>
+  <script defer src="scripts/main.js?v=20251006b"></script>
 </body>
 </html>
