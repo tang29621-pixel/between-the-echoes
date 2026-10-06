@@ -594,9 +594,20 @@
         if (textEl) textEl.textContent = '加载失败，请检查网络';
       }, { once: true });
 
-      // 把 ph 替换成 [loadingOverlay + mv] 两个并列节点
-      // 这样 overlay 隐藏不影响 mv
-      ph.replaceWith(loadingOverlay, mv);
+      // 把 ph 替换成一个 slot div，里面包含 [loadingOverlay, mv]
+      // 这样 grid 里仍然是一个 column 1 item（不破坏布局），
+      // 加载完只隐藏 overlay，mv 继续渲染
+      const slot = document.createElement('div');
+      slot.className = 'item__media item__media--slot';
+      slot.style.cssText = 'position:relative;width:100%;height:100%;min-height:480px;';
+      loadingOverlay.style.cssText += 'position:absolute;inset:0;z-index:2;';
+      mv.style.position = 'absolute';
+      mv.style.inset = '0';
+      mv.style.width = '100%';
+      mv.style.height = '100%';
+      slot.appendChild(loadingOverlay);
+      slot.appendChild(mv);
+      ph.replaceWith(slot);
       // 启用 model-viewer 自带的 auto-rotate：每秒 16°，延迟 300ms 立即开始
       mv.setAttribute('auto-rotate', '');
       mv.setAttribute('auto-rotate-delay', '300');
