@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="回声之间 —— 在走远的人与你之间，有一个可以回顾的空间。首个概念案例：《没有到达的海》。">
+  <title>回声之间 · Between the Echoes</title>
+  <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <main id="app" class="app">
+
+    <!-- ============ 章节 1：首页 ============ -->
+    <section class="chapter chapter--home" id="chapter-1" data-chapter="home">
+      <div class="chapter__bg" style="background-image: url('assets/images/reference/stage-01-home-sea.jpg');"></div>
+      <div class="chapter__overlay"></div>
+      <div class="chapter__inner">
+        <p class="home__line home__line--1">在走远的人与你之间，</p>
+        <p class="home__line home__line--2">有一个可以回顾的空间。</p>
+
+        <div class="home__title-wrap">
+          <h1 class="home__title">回声之间</h1>
+          <p class="home__sub">Between the Echoes</p>
+          <p class="home__intro">一个关于纪念与回响的数字空间。<span class="text__en">A digital space for remembrance & reverberation.</span></p>
+        </div>
+
+        <button class="enter-btn" data-go="video-hook">
+          <span>体验《没有到达的海》</span>
+          <span class="enter-btn__sub">首个概念案例</span>
+        </button>
+
+        <p class="home__hint">建议佩戴耳机 · 调暗屏幕</p>
+      </div>
+    </section>
+
+    <!-- ============ 章节 1.5：前情钩子视频 ============ -->
+    <section class="chapter chapter--video-hook" id="chapter-hook" data-chapter="video-hook" hidden>
+      <div class="video__wrap">
+        <button class="video__skip" data-skip="hook">跳过 →</button>
+        <video class="video__player" id="videoHook"
+               src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BC%80%E5%A4%B4-27%E7%A7%92.mp4"
+               playsinline
+               preload="metadata"></video>
+        <div class="video__overlay" id="videoHookOverlay">
+          <p class="video__caption">前情</p>
+          <span class="source-badge" style="color: #8a9ac8; border-color: #8a9ac8;">AI 推演</span>
+        </div>
+        <div class="video__end" id="videoHookEnd">
+          <div class="video__end-frame">
+            <header class="video__end-header">
+              <span class="video__end-rule"></span>
+              <span class="video__end-brand">回 声 之 间</span>
+              <span class="video__end-rule"></span>
+            </header>
+
+            <div class="video__end-meta">
+              <span class="video__end-decor"></span>
+              <span class="video__end-code">PROLOGUE 001</span>
+              <span class="video__end-decor"></span>
+            </div>
+
+            <h2 class="video__end-title">故事开始之前，他已经走了<span class="text__en">Before the story began, he had already left.</span></h2>
+
+            <button class="video__end-btn" data-go="intro">
+              进入短片
+              <span class="video__end-btn-icon">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 章节 2：案例导览 ============ -->
+    <section class="chapter chapter--intro" id="chapter-2" data-chapter="intro" hidden>
+      <div class="chapter__inner">
+        <div class="intro__layout">
+          <!-- 左栏：标题 + 故事 + 开始体验 -->
+          <div class="intro__col intro__col--left">
+            <header class="intro__header">
+              <p class="intro__eyebrow">案例导览</p>
+              <h1 class="intro__title">《没有到达的海》<span class="text__en">The Sea Never Reached</span></h1>
+              <p class="intro__subtitle">陈默 · 与父亲未完成的一次同行<span class="text__en">Chen Mo · An Unfinished Journey With His Father</span></p>
+            </header>
+
+            <div class="intro__story">
+              <p class="intro__story-text">
+                这是「回声之间」的首个概念案例。<br>
+                一段虚构的家庭叙事，用来呈现纪念空间的可能形态。
+                <span class="text__en">The first concept case of Between the Echoes —<br>a fictional family narrative of what remembrance can become.</span>
+              </p>
+              <p class="intro__story-text intro__story-text--dim">
+                故事取材于多个家庭的真实情感，但人物、物件、录音均为创作素材。
+                <span class="text__en">Inspired by real emotions. People, objects, and recordings are fictional.</span>
+              </p>
+            </div>
+
+            <button class="enter-btn enter-btn--primary intro__cta" data-go="video-a">
+              <span>开始体验</span>
+              <span class="enter-btn__sub">短片 · 没有出发的星期日</span>
+            </button>
+          </div>
+
+          <!-- 中间分隔线 -->
+          <div class="intro__divider" aria-hidden="true"></div>
+
+          <!-- 右栏：来源说明 + 卡片网格 -->
+          <div class="intro__col intro__col--right">
+            <div class="intro__sources">
+              <h2 class="intro__sources-title">为了让你清楚每段内容的来源<span class="text__en">So You Know Where Every Moment Comes From</span></h2>
+              <p class="intro__sources-sub">本案例使用以下 4 种来源标签：<span class="text__en">This case uses four source labels.</span></p>
+              <div class="intro__cards" id="introCards">
+                <!-- 由 JS 渲染 -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="intro__hint">体验时长约 5-8 分钟 · 可随时按 Esc 回到首页</p>
+      </div>
+    </section>
+
+    <!-- ============ 章节 3：短片一 · 没有出发的星期日 ============ -->
+    <section class="chapter chapter--video-a" id="chapter-3" data-chapter="video-a" hidden>
+      <div class="video__wrap">
+        <button class="video__skip" data-skip="shortA">跳过 →</button>
+        <video class="video__player" id="videoA"
+               src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BC%80%E7%AE%B1-29.mp4"
+               playsinline
+               preload="metadata"></video>
+        <div class="video__overlay" id="videoAOverlay">
+          <p class="video__caption">《没有出发的星期日》</p>
+          <span class="source-badge" style="color: #8aaa9a; border-color: #8aaa9a;">原始档案</span>
+        </div>
+        <div class="video__end" id="videoAEnd">
+          <div class="video__end-frame">
+            <header class="video__end-header">
+              <span class="video__end-rule"></span>
+              <span class="video__end-brand">回 声 之 间</span>
+              <span class="video__end-rule"></span>
+            </header>
+
+            <div class="video__end-meta">
+              <span class="video__end-decor"></span>
+              <span class="video__end-code">ARCHIVE 017</span>
+              <span class="video__end-decor"></span>
+            </div>
+
+            <h2 class="video__end-title">有些东西，他一直留着<span class="text__en">Some things he kept close.</span></h2>
+
+            <button class="video__end-btn" data-go="archive">
+              查看留下的东西
+              <span class="video__end-btn-icon">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 章节 4：旧房 · 旧物档案 ============ -->
+    <section class="chapter chapter--archive" id="chapter-4" data-chapter="archive" hidden>
+      <div class="archive__container" id="archiveContainer">
+
+        <!-- 物品 1：画 -->
+        <article class="item" data-item="painting"
+                 data-source-type="original"
+                 style="--bg-image: url('assets/images/frames/processed/item-painting-bg.jpg');">
+          <model-viewer class="item__media"
+                  src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/painting.glb"
+                  alt="一幅画"
+                  camera-controls
+                  auto-rotate
+                  auto-rotate-delay="2000"
+                  rotation-per-second="14deg"
+                  shadow-intensity="0.6"
+                  exposure="1.1"
+                  camera-orbit="45deg 75deg 1.4m"></model-viewer>
+          <div class="item__content">
+            <p class="item__meta">
+              <span class="source-badge" style="color: #8aaa9a; border-color: #8aaa9a;">原始档案</span>
+              · 旧物一
+            </p>
+            <h2 class="item__title">一幅未完成的临摹<span class="text__en">An Unfinished Study</span></h2>
+            <p class="item__text">
+              父亲临摹过很多次海，但这一张停在了海平线之前。<br>
+              笔触在颜色没干时就搁下了——像被打断的一次回信。
+              <span class="text__en">His father copied the sea many times;<br>this one stopped before the horizon —<br>brush paused before the colors dried,<br>like an interrupted reply.</span>
+            </p>
+            <button class="audio-btn" data-audio="painting.mp3">
+              <span class="audio-btn__circle"></span>
+              <span class="audio-btn__label">收听家人的话</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- 物品 2：车票 -->
+        <article class="item" data-item="ticket" hidden
+                 data-source-type="original"
+                 style="--bg-image: url('assets/images/frames/processed/item-ticket-bg.jpg');">
+          <model-viewer class="item__media"
+                  src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/ticket.glb"
+                  alt="一张车票"
+                  camera-controls
+                  auto-rotate
+                  auto-rotate-delay="2000"
+                  rotation-per-second="14deg"
+                  shadow-intensity="0.6"
+                  exposure="1.1"
+                  camera-orbit="45deg 75deg 1.4m"></model-viewer>
+          <div class="item__content">
+            <p class="item__meta">
+              <span class="source-badge" style="color: #8aaa9a; border-color: #8aaa9a;">原始档案</span>
+              · 旧物二
+            </p>
+            <h2 class="item__title">去往海边的单程票<span class="text__en">A One-Way Ticket to the Sea</span></h2>
+            <p class="item__text">
+              票根上写着「内陆 → 海边」。<br>
+              单程，已使用——却没有留下到达的印章。
+              <span class="text__en">Marked "Inland → Sea".<br>One way, already used —<br>yet no stamp of arrival.</span>
+            </p>
+            <button class="audio-btn" data-audio="ticket.mp3">
+              <span class="audio-btn__circle"></span>
+              <span class="audio-btn__label">收听家人的话</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- 物品 3：缺口杯 -->
+        <article class="item" data-item="cup" hidden
+                 data-source-type="family"
+                 style="--bg-image: url('assets/images/frames/processed/item-cup-bg.jpg');">
+          <model-viewer class="item__media"
+                  src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/cup.glb"
+                  alt="一个缺口杯"
+                  camera-controls
+                  auto-rotate
+                  auto-rotate-delay="2000"
+                  rotation-per-second="14deg"
+                  shadow-intensity="0.6"
+                  exposure="1.1"
+                  camera-orbit="45deg 75deg 1.4m"></model-viewer>
+          <div class="item__content">
+            <p class="item__meta">
+              <span class="source-badge" style="color: #d8b07a; border-color: #d8b07a;">家人补充</span>
+              · 旧物三
+            </p>
+            <h2 class="item__title">没舍得扔的那只杯<span class="text__en">The Cup No One Could Throw Away</span></h2>
+            <p class="item__text">
+              是某次搬家时磕坏的。杯口缺了一块，谁也没扔。<br>
+              倒水时水流会从缺口溢出——像一个小小的提醒。
+              <span class="text__en">Chipped during a move.<br>Nobody threw it away.<br>Water spills from the gap —<br>a quiet reminder.</span>
+            </p>
+            <button class="audio-btn" data-audio="cup.mp3">
+              <span class="audio-btn__circle"></span>
+              <span class="audio-btn__label">收听家人的话</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- 物品 4：父亲的信 -->
+        <article class="item" data-item="letter" hidden
+                 data-source-type="original"
+                 style="--bg-image: url('assets/images/frames/processed/item-letter-bg.jpg');">
+          <model-viewer class="item__media"
+                  src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/letter.glb"
+                  alt="一封信"
+                  camera-controls
+                  auto-rotate
+                  auto-rotate-delay="2000"
+                  rotation-per-second="14deg"
+                  shadow-intensity="0.6"
+                  exposure="1.1"
+                  camera-orbit="45deg 75deg 1.4m"></model-viewer>
+          <div class="item__content">
+            <p class="item__meta">
+              <span class="source-badge" style="color: #8aaa9a; border-color: #8aaa9a;">原始档案</span>
+              · 旧物四
+            </p>
+            <h2 class="item__title">父亲留下的信<span class="text__en">A Letter Father Left Behind</span></h2>
+            <p class="item__text">
+              信封上盖着「未送达」。<br>
+              父亲记得这次约定，希望陈默继续去看看。
+              <span class="text__en">Stamped "Undelivered".<br>Father remembered this appointment —<br>hoping Chen Mo will still go.</span>
+            </p>
+            <button class="audio-btn" data-audio="letter.mp3">
+              <span class="audio-btn__circle"></span>
+              <span class="audio-btn__label">收听家人的话</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- 翻页控制 -->
+        <div class="archive__nav">
+          <p class="archive__counter">
+            <span id="archiveIndex">1</span>
+            <span class="archive__counter-sep"> / </span>
+            <span id="archiveTotal">4</span>
+          </p>
+          <div class="archive__buttons">
+            <button class="nav-btn archive__prev" id="archivePrev">← 上一件</button>
+            <button class="enter-btn enter-btn--primary archive__next" id="archiveNext">
+              <span>前往那片海</span>
+              <span class="archive__next-icon">→</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 直接显示 3D 模型，无需点击进入 -->
+      </div>
+    </section>
+
+    <!-- ============ 章节 5：AI 推演提示 ============ -->
+    <section class="chapter chapter--ai-prompt" id="chapter-5" data-chapter="ai-prompt" hidden>
+      <div class="chapter__inner">
+      <div class="ai-prompt__panel">
+        <header class="ai-prompt__header">
+          <span class="ai-prompt__icon">◈</span>
+          <h2 class="ai-prompt__title">AI 推演</h2>
+        </header>
+        <p class="ai-prompt__text">
+          接下来是陈默的「想象」。<br>
+          画面基于档案与家人描述构建，<br>
+          并非历史事实。
+        </p>
+        <p class="ai-prompt__sub">
+          这片海来自一次未完成的约定。<br>
+          接下来的同行，由模型推演。
+        </p>
+        <button class="enter-btn" data-go="video-b">
+          <span>知道了</span>
+          <span class="enter-btn__sub">继续</span>
+        </button>
+      </div>
+      </div>
+    </section>
+
+    <!-- ============ 章节 6：短片二 · 想象中的抵达 ============ -->
+    <section class="chapter chapter--video-b" id="chapter-6" data-chapter="video-b" hidden>
+      <div class="video__wrap">
+        <button class="video__skip" data-skip="shortB">跳过 →</button>
+        <video class="video__player" id="videoB"
+               src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/ai%E9%AA%8C%E7%AE%97.mp4"
+               playsinline
+               preload="metadata"></video>
+        <div class="video__overlay" id="videoBOverlay">
+          <p class="video__caption">《想象中的抵达》</p>
+          <span class="source-badge" style="color: #8a9ac8; border-color: #8a9ac8;">AI 推演</span>
+        </div>
+        <div class="video__end" id="videoBEnd">
+          <div class="video__end-frame">
+            <header class="video__end-header">
+              <span class="video__end-rule"></span>
+              <span class="video__end-brand">回 声 之 间</span>
+              <span class="video__end-rule"></span>
+            </header>
+
+            <div class="video__end-meta">
+              <span class="video__end-decor"></span>
+              <span class="video__end-code">REUNION · AI</span>
+              <span class="video__end-decor"></span>
+            </div>
+
+            <h2 class="video__end-title">他一直等着你走近<span class="text__en">He has been waiting.</span></h2>
+
+            <button class="video__end-btn" data-go="sea">
+              走近长椅
+              <span class="video__end-btn-icon">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 章节 7：海边 · 留下的位置 ============ -->
+    <section class="chapter chapter--sea" id="chapter-7" data-chapter="sea" hidden>
+      <div class="sea__fallback" style="background-image: url('assets/images/reference/stage-06-father-son-beach.jpg');"></div>
+      <div class="sea__mist"></div>
+
+      <div class="sea__content">
+        <p class="sea__hint" id="seaHint">在画面中寻找留下的位置。</p>
+
+        <!-- 热点 1：长椅（点击播放叠加视频） -->
+        <button class="sea__hotspot" data-hotspot="bench" style="bottom: 22%; left: 48%; transform: translateX(-50%);">
+          <span class="sea__hotspot-dot"></span>
+          <span class="sea__hotspot-label">长椅</span>
+        </button>
+
+        <!-- 热点 2：杯子（点击打开物品详情浮层） -->
+        <button class="sea__hotspot" data-hotspot="items-cup" style="top: 38%; right: 36%;">
+          <span class="sea__hotspot-dot"></span>
+          <span class="sea__hotspot-label">缺口杯</span>
+        </button>
+
+        <!-- 热点 3：车票（点击打开物品详情浮层） -->
+        <button class="sea__hotspot" data-hotspot="items-ticket" style="top: 38%; right: 22%;">
+          <span class="sea__hotspot-dot"></span>
+          <span class="sea__hotspot-label">单程票</span>
+        </button>
+
+        <!-- 热点 4：纸条 -->
+        <button class="sea__hotspot" data-hotspot="note" style="top: 30%; right: 18%;">
+          <span class="sea__hotspot-dot"></span>
+          <span class="sea__hotspot-label">纸条</span>
+        </button>
+
+        <!-- 长椅弹层（不显示，由叠加视频代替） -->
+        <!-- 物品弹层（保留文案，原 items hotspot 拆分后已不再使用此浮层） -->
+        <div class="sea__panel" id="panelItems" hidden>
+          <p class="sea__panel-text">
+            杯子与车票被留在了长椅边的沙上。<br>
+            它们没有跟着这次想象中的同行一起出现——
+            它们是「现实」中陈默真的带来的东西。
+          </p>
+          <button class="sea__panel-close" data-close="panelItems">知道了</button>
+        </div>
+
+        <!-- 纸条弹层 -->
+        <div class="sea__panel sea__panel--note" id="panelNote" hidden>
+          <p class="sea__panel-text sea__panel-text--quote">
+            「下一次我带她来。」
+            <span class="text__en">"Next time, I'll bring her."</span>
+          </p>
+          <p class="sea__panel-sub">
+            ——陈默的纸条
+            <span class="text__en">— Chen Mo's note</span>
+          </p>
+          <button class="sea__sea-note-btn" id="seaNoteBtn" type="button">
+            <span>看看后来</span>
+            <span class="end__easter-egg-icon">◈</span>
+          </button>
+          <button class="sea__panel-close" data-close="panelNote">知道了</button>
+        </div>
+
+        <!-- 底部按钮：找到全部后显示 -->
+        <div class="sea__bottom">
+          <button class="enter-btn enter-btn--light" id="seaWriteBtn" hidden data-go="video-c">
+            看看后来
+          </button>
+        </div>
+      </div>
+
+      <!-- 全站背景音乐（用户首次点击后自动有声；视频播放时自动淡出） -->
+      <audio id="bgmAudio" src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/sea-ambient.mp3" loop preload="metadata" muted></audio>
+    </section>
+
+    <!-- ============ 章节 8：短片三 · 带你认识他 ============ -->
+    <section class="chapter chapter--video-c" id="chapter-8" data-chapter="video-c" hidden>
+      <div class="video__wrap">
+        <button class="video__skip" data-skip="shortC">跳过 →</button>
+        <video class="video__player" id="videoC"
+               src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E7%A9%BA%E6%A4%85%E5%AD%90.mp4"
+               playsinline
+               preload="metadata"></video>
+        <div class="video__overlay" id="videoCOverlay">
+          <p class="video__caption">《带你认识他》</p>
+          <span class="source-badge" style="color: #8a9ac8; border-color: #8a9ac8;">AI 推演</span>
+        </div>
+        <div class="video__end video__end--dual" id="videoCEnd">
+          <div class="video__end-frame">
+            <header class="video__end-header">
+              <span class="video__end-rule"></span>
+              <span class="video__end-brand">回 声 之 间</span>
+              <span class="video__end-rule"></span>
+            </header>
+
+            <div class="video__end-meta">
+              <span class="video__end-decor"></span>
+              <span class="video__end-code">INHERITANCE</span>
+              <span class="video__end-decor"></span>
+            </div>
+
+            <h2 class="video__end-title">陈默把父亲的故事讲给了她<span class="text__en">Chen Mo told his father's story to her.</span></h2>
+            <p class="video__end-sub">你有没有一句话，也想留下？</p>
+
+            <div class="video__end-dual-btns">
+              <button class="video__end-btn video__end-btn--primary" data-go="write">
+                我也想写几句话
+              </button>
+              <button class="video__end-btn video__end-btn--ghost" data-go="end">
+                暂时不写
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 章节 9：写一封信 ============ -->
+    <section class="chapter chapter--write" id="chapter-9" data-chapter="write" hidden>
+      <video class="write__bg-video" id="letterBgVideo"
+             src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E7%A9%BA%E6%A4%85%E5%AD%90.mp4"
+             muted loop playsinline preload="metadata"></video>
+      <div class="write__wrap">
+        <p class="write__prompt">此刻，你想对谁说点什么？<span class="text__en">Whom would you like to speak to?</span></p>
+        <p class="write__sub">写给一个还在的人，或者一个已经不在的人。<span class="text__en">For someone still here, or someone already gone.</span></p>
+
+        <p class="write__source-note">
+          <span class="source-badge" style="color: #c8a8e0; border-color: #c8a8e0;">本次书写</span>
+          你的信仅在本机保留，不公开展示。
+        </p>
+
+        <div class="write__paper" id="writePaper">
+          <textarea class="write__display" id="writeDisplay"
+                    rows="8"
+                    spellcheck="false"
+                    placeholder="写下你想说的话…"></textarea>
+        </div>
+
+        <div class="write__actions">
+          <button class="write__clear" id="writeClear">清空重写</button>
+          <button class="enter-btn" id="writePreview">
+            <span>预览这封信</span>
+            <span class="enter-btn__sub">看看放下前的样子</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 章节 10：确认内容 ============ -->
+    <section class="chapter chapter--confirm" id="chapter-10" data-chapter="confirm" hidden>
+      <div class="confirm__bg" style="background-image: url('assets/images/reference/stage-09-write-sea.jpg');"></div>
+      <div class="confirm__mist"></div>
+
+      <div class="confirm__content">
+        <p class="confirm__eyebrow">这是你即将放下的信</p>
+
+        <div class="confirm__paper">
+          <p class="confirm__text" id="confirmText">（信的内容将在这里显示）</p>
+          <p class="confirm__date" id="confirmDate"></p>
+        </div>
+
+        <p class="confirm__source-note">
+          <span class="source-badge" style="color: #c8a8e0; border-color: #c8a8e0;">本次书写</span>
+          你的信仅在本机保留，不公开展示，不混入陈默家的档案。
+        </p>
+
+        <div class="confirm__actions">
+          <button class="confirm__back" data-go="write">
+            ← 返回修改
+          </button>
+          <button class="enter-btn" id="confirmSubmit">
+            <span>把信留在这片海</span>
+            <span class="enter-btn__sub">就此放下</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 章节 11：结束页 · 在海边读自己的信 ============ -->
+    <section class="chapter chapter--end" id="chapter-11" data-chapter="end" hidden>
+      <div class="end__bg" style="background-image: url('assets/images/frames/processed/end-bg.jpg');"></div>
+      <div class="end__sea"></div>
+
+      <div class="end__content">
+        <!-- 用户刚才写下的信 -->
+        <div class="end__your-letter" id="endYourLetter" hidden>
+          <p class="end__your-letter-label">
+            <span class="source-badge" style="color: #c8a8e0; border-color: #c8a8e0;">你的信</span>
+            你刚才写下的
+          </p>
+          <p class="end__your-letter-text" id="endYourLetterText"></p>
+        </div>
+
+        <p class="end__line end__line--1">在未来，</p>
+        <p class="end__line end__line--2">每个家庭都可以拥有</p>
+        <p class="end__line end__line--3">这样一处独属的纪念空间。</p>
+        <p class="end__line end__line--4">——用真实档案，用家人补充，</p>
+        <p class="end__line end__line--5">用 AI 推演补上未寄出的回信。</p>
+        <p class="end__line end__line--6">用文字，用声音，用海边的长椅。</p>
+        <p class="end__en"><span class="text__en">In time, every family could hold such a private space of remembrance — built from real archives, family additions, and AI-imagined replies to letters never sent.</span></p>
+
+        <div class="end__future">
+          <p class="end__future-title">下一阶段</p>
+          <ul class="end__future-list">
+            <li>· 每个家庭可自行创建自己的纪念空间</li>
+            <li>· AR / VR 进入亲人留下的场景</li>
+            <li>· 长期保存 · 多代传承</li>
+          </ul>
+        </div>
+
+        <!-- 彩蛋：父亲留下的另一段记录 -->
+        <div class="end__easter-egg" id="endEasterEgg">
+          <p class="end__easter-egg-eyebrow">彩蛋 · 父亲留下的另一段记录</p>
+          <p class="end__easter-egg-text">有一帧他没舍得删掉。点击看看。</p>
+          <button class="end__easter-egg-btn" id="endEasterEggBtn" type="button">
+            <span class="end__easter-egg-icon">◈</span>
+            <span>播放这一段</span>
+          </button>
+        </div>
+
+        <div class="end__nav">
+          <button class="enter-btn" data-go="archive">
+            <span>回到旧物</span>
+            <span class="enter-btn__sub">重看留下的物件</span>
+          </button>
+          <button class="enter-btn enter-btn--light" data-go="sea">
+            <span>回到海边</span>
+            <span class="enter-btn__sub">再走一遍位置</span>
+          </button>
+          <button class="enter-btn enter-btn--ghost" data-go="home">
+            <span>返回首页</span>
+            <span class="enter-btn__sub">重新开始</span>
+          </button>
+        </div>
+
+        <p class="end__sign">回声之间 · Between the Echoes</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       非章节浮层 1：物品 3D 详情
+       ============================================================ -->
+  <div class="item-detail" id="itemDetail" hidden>
+    <div class="item-detail__backdrop" data-close="itemDetail"></div>
+    <div class="item-detail__panel">
+      <button class="item-detail__close" data-close="itemDetail" aria-label="关闭">×</button>
+
+      <header class="item-detail__header">
+        <span class="source-badge"></span>
+        <h3 class="item-detail__title"></h3>
+        <p class="item-detail__source-note source-note"></p>
+      </header>
+
+      <div class="item-detail__body">
+        <div class="item-detail__model">
+          <!-- 由 JS 注入：Phase 1 SVG 占位 / Phase 3 model-viewer -->
+        </div>
+        <aside class="item-detail__text">
+          <!-- 由 JS 注入物品描述 -->
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       非章节浮层 2：海边长椅叠加视频
+       ============================================================ -->
+  <div class="sea-overlay" id="seaOverlay" hidden>
+    <div class="sea-overlay__backdrop" data-close="seaOverlay"></div>
+    <video class="sea-overlay__player" id="benchPlayer"
+           src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E9%99%88%E9%BB%98%E7%9A%84%E5%9B%9E%E4%BF%A1-14.mp4"
+           playsinline
+           preload="metadata"></video>
+
+    <div class="sea-overlay__placeholder" hidden>
+      <p class="sea-overlay__placeholder-title">长椅 · 爸，我到了</p>
+      <p class="sea-overlay__placeholder-text">
+        <span class="source-badge" style="color: #8a9ac8; border-color: #8a9ac8;">AI 推演</span>
+      </p>
+    </div>
+
+    <div class="sea-overlay__controls">
+      <button class="sea-overlay__replay" hidden>
+        再看一次
+      </button>
+      <button class="sea-overlay__close" data-close="seaOverlay" aria-label="关闭">×</button>
+    </div>
+  </div>
+
+  <!-- 彩蛋视频浮层（结束页触发） -->
+  <div class="easter-overlay" id="easterOverlay" hidden>
+    <div class="easter-overlay__backdrop" data-close="easterOverlay"></div>
+    <video class="easter-overlay__player" id="easterPlayer"
+           src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BD%A9%E8%9B%8B.mp4"
+           playsinline preload="metadata"></video>
+    <div class="easter-overlay__controls">
+      <button class="easter-overlay__close" data-close="easterOverlay" aria-label="关闭">×</button>
+    </div>
+  </div>
+
+  <!-- 模块脚本（按依赖顺序加载） -->
+  <!-- model-viewer 是自包含的（自带 three），直接加载 -->
+  <script type="module" src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/model-viewer.min.js"></script>
+  <script defer src="scripts/source-labels.js"></script>
+  <!-- 启动 splash：Chrome autoplay 政策要求用户首次手势才能有声音 -->
+  <!-- 用户点击 splash 后立即解锁 BGM + 进入首页体验 -->
+  <div class="start-splash" id="startSplash">
+    <div class="start-splash__inner">
+      <p class="start-splash__eyebrow">在走远的人与你之间</p>
+      <h1 class="start-splash__title">回声之间</h1>
+      <p class="start-splash__en">Between the Echoes</p>
+      <p class="start-splash__hint">建议佩戴耳机 · 调暗屏幕</p>
+      <button class="start-splash__btn" id="startSplashBtn" type="button">
+        <span class="start-splash__btn-text">点 击 开 始 体 验</span>
+        <span class="start-splash__btn-sub">首个概念案例 · 《没有到达的海》</span>
+      </button>
+    </div>
+  </div>
+
+  <script defer src="scripts/video-stage.js"></script>
+  <script defer src="scripts/item-detail.js"></script>
+  <script defer src="scripts/sea-scene.js"></script>
+  <script defer src="scripts/main.js"></script>
+</body>
+</html>

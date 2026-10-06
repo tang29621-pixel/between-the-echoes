@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- 天空渐变 -->
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a1822"/>
+      <stop offset="40%" stop-color="#15293a"/>
+      <stop offset="70%" stop-color="#1f3a4d"/>
+      <stop offset="100%" stop-color="#2a4a5d"/>
+    </linearGradient>
+    <!-- 海面渐变 -->
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a3548"/>
+      <stop offset="50%" stop-color="#15293a"/>
+      <stop offset="100%" stop-color="#0a1822"/>
+    </linearGradient>
+    <!-- 雾气 -->
+    <radialGradient id="mist" cx="50%" cy="55%" r="60%">
+      <stop offset="0%" stop-color="#3a5a6e" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#0a1822" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 天空 -->
+  <rect width="1600" height="540" fill="url(#sky)"/>
+
+  <!-- 海面 -->
+  <rect y="540" width="1600" height="360" fill="url(#sea)"/>
+
+  <!-- 海平线 -->
+  <line x1="0" y1="540" x2="1600" y2="540" stroke="#5a7a8a" stroke-width="0.8" opacity="0.4"/>
+
+  <!-- 雾气覆盖 -->
+  <rect width="1600" height="900" fill="url(#mist)"/>
+
+  <!-- 远处隐约的礁石剪影 -->
+  <path d="M 100 545 L 180 535 L 240 548 L 290 540 L 320 545 Z" fill="#0a1822" opacity="0.7"/>
+  <path d="M 1300 548 L 1380 538 L 1440 546 L 1520 540 L 1580 548 Z" fill="#0a1822" opacity="0.7"/>
+
+  <!-- 海面反光 -->
+  <ellipse cx="800" cy="600" rx="280" ry="14" fill="#4a6a7e" opacity="0.25"/>
+  <ellipse cx="800" cy="640" rx="200" ry="8" fill="#4a6a7e" opacity="0.2"/>
+
+  <!-- 远处小船的微弱剪影 -->
+  <g transform="translate(900 525)" opacity="0.55">
+    <path d="M -8 0 L 8 0 L 6 4 L -6 4 Z" fill="#0a1822"/>
+    <line x1="0" y1="0" x2="0" y2="-12" stroke="#0a1822" stroke-width="0.6"/>
+    <path d="M 0 -12 L 6 -3 L 0 -3 Z" fill="#0a1822"/>
+  </g>
+
+  <!-- 海面细微波纹 -->
+  <g stroke="#3a5a6e" stroke-width="0.4" opacity="0.3">
+    <line x1="0" y1="580" x2="1600" y2="580"/>
+    <line x1="0" y1="620" x2="1600" y2="620"/>
+    <line x1="0" y1="660" x2="1600" y2="660"/>
+    <line x1="0" y1="710" x2="1600" y2="710"/>
+    <line x1="0" y1="760" x2="1600" y2="760"/>
+  </g>
+
+  <!-- 沙地前景 -->
+  <path d="M 0 780 Q 800 760 1600 790 L 1600 900 L 0 900 Z" fill="#1a2a35"/>
+
+  <!-- 沙地上一块长椅的暗示 -->
+  <g transform="translate(720 820)" opacity="0.45">
+    <rect x="-80" y="-3" width="160" height="6" fill="#0a1822"/>
+    <rect x="-78" y="-3" width="3" height="20" fill="#0a1822"/>
+    <rect x="75" y="-3" width="3" height="20" fill="#0a1822"/>
+    <line x1="-78" y1="-15" x2="-78" y2="-3" stroke="#0a1822" stroke-width="2"/>
+    <line x1="78" y1="-15" x2="78" y2="-3" stroke="#0a1822" stroke-width="2"/>
+    <line x1="-78" y1="-15" x2="78" y2="-15" stroke="#0a1822" stroke-width="2"/>
+    <line x1="-70" y1="-12" x2="-70" y2="-5" stroke="#0a1822" stroke-width="1"/>
+    <line x1="-50" y1="-12" x2="-50" y2="-5" stroke="#0a1822" stroke-width="1"/>
+    <line x1="-30" y1="-12" x2="-30" y2="-5" stroke="#0a1822" stroke-width="1"/>
+    <line x1="-10" y1="-12" x2="-10" y2="-5" stroke="#0a1822" stroke-width="1"/>
+    <line x1="10" y1="-12" x2="10" y2="-5" stroke="#0a1822" stroke-width="1"/>
+    <line x1="30" y1="-12" x2="30" y2="-5" stroke="#0a1822" stroke-width="1"/>
+    <line x1="50" y1="-12" x2="50" y2="-5" stroke="#0a1822" stroke-width="1"/>
+    <line x1="70" y1="-12" x2="70" y2="-5" stroke="#0a1822" stroke-width="1"/>
+  </g>
+
+  <!-- 占位标签 -->
+  <text x="40" y="860" fill="#d8c89a" opacity="0.35" font-family="serif" font-size="13" letter-spacing="3">SEA · PLACEHOLDER</text>
+</svg>

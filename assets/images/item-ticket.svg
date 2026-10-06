@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid meet">
+  <rect width="400" height="500" fill="#0e1a22"/>
+
+  <radialGradient id="glow" cx="50%" cy="50%" r="55%">
+    <stop offset="0%" stop-color="#3a4a5a" stop-opacity="0.55"/>
+    <stop offset="60%" stop-color="#1a2630" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="400" height="500" fill="url(#glow)"/>
+
+  <!-- 倾斜的车票 -->
+  <g transform="translate(200 250) rotate(-8) translate(-200 -250)">
+    <!-- 主体 -->
+    <rect x="80" y="200" width="240" height="120" fill="#e8dcc0" stroke="#5a4a2a" stroke-width="1.5"/>
+
+    <!-- 撕开线 -->
+    <line x1="240" y1="200" x2="240" y2="320" stroke="#5a4a2a" stroke-width="1" stroke-dasharray="3 3"/>
+
+    <!-- 主票面 -->
+    <text x="100" y="230" fill="#3a2a1a" font-family="serif" font-size="13" letter-spacing="2">单程 · ONE WAY</text>
+    <line x1="100" y1="240" x2="220" y2="240" stroke="#5a4a2a" stroke-width="0.5" opacity="0.5"/>
+
+    <text x="100" y="270" fill="#3a2a1a" font-family="serif" font-size="11" opacity="0.6">从 FROM</text>
+    <text x="100" y="290" fill="#3a2a1a" font-family="serif" font-size="18" letter-spacing="3">内陆</text>
+
+    <text x="100" y="310" fill="#3a2a1a" font-family="serif" font-size="11" opacity="0.6">到 TO</text>
+
+    <!-- 副票面 -->
+    <text x="260" y="230" fill="#3a2a1a" font-family="serif" font-size="10" opacity="0.7">海边</text>
+    <text x="260" y="260" fill="#3a2a1a" font-family="serif" font-size="10" opacity="0.7">NO. 0421</text>
+    <text x="260" y="290" fill="#3a2a1a" font-family="serif" font-size="10" opacity="0.7">已使用</text>
+    <circle cx="285" cy="285" r="14" fill="none" stroke="#8a3a2a" stroke-width="1" opacity="0.7"/>
+    <text x="285" y="289" text-anchor="middle" fill="#8a3a2a" font-family="serif" font-size="8" opacity="0.8">USED</text>
+  </g>
+
+  <text x="200" y="430" text-anchor="middle" fill="#d8c89a" opacity="0.7" font-family="serif" font-size="16" letter-spacing="6">车票 · 去往海边的单程</text>
+  <text x="200" y="455" text-anchor="middle" fill="#7a8a9a" opacity="0.6" font-family="serif" font-size="11" letter-spacing="2">THE TICKET · PLACEHOLDER</text>
+</svg>

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid meet">
+  <rect width="400" height="500" fill="#0e1a22"/>
+
+  <radialGradient id="glow" cx="50%" cy="50%" r="55%">
+    <stop offset="0%" stop-color="#3a4a5a" stop-opacity="0.55"/>
+    <stop offset="60%" stop-color="#1a2630" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="400" height="500" fill="url(#glow)"/>
+
+  <!-- 折起的一封信 -->
+  <g transform="translate(200 250) rotate(-4) translate(-200 -250)">
+    <!-- 信封主体 -->
+    <rect x="80" y="170" width="240" height="170" fill="#e8dcc0" stroke="#5a4a2a" stroke-width="1.5"/>
+
+    <!-- 折线 -->
+    <line x1="80" y1="255" x2="320" y2="255" stroke="#5a4a2a" stroke-width="0.6" opacity="0.5"/>
+
+    <!-- 信封开口三角 -->
+    <polyline points="80,170 200,260 320,170" fill="none" stroke="#5a4a2a" stroke-width="1" opacity="0.6"/>
+
+    <!-- 邮票方框 -->
+    <rect x="270" y="185" width="38" height="38" fill="none" stroke="#5a4a2a" stroke-width="0.8" opacity="0.6"/>
+    <line x1="270" y1="195" x2="308" y2="195" stroke="#5a4a2a" stroke-width="0.4" opacity="0.5"/>
+    <line x1="270" y1="205" x2="308" y2="205" stroke="#5a4a2a" stroke-width="0.4" opacity="0.5"/>
+    <line x1="280" y1="185" x2="280" y2="223" stroke="#5a4a2a" stroke-width="0.4" opacity="0.5"/>
+    <line x1="298" y1="185" x2="298" y2="223" stroke="#5a4a2a" stroke-width="0.4" opacity="0.5"/>
+
+    <!-- 收信人位置 -->
+    <text x="100" y="295" fill="#3a2a1a" font-family="serif" font-size="11" opacity="0.55">致</text>
+    <line x1="115" y1="300" x2="240" y2="300" stroke="#3a2a1a" stroke-width="0.5" opacity="0.4"/>
+
+    <!-- 未送达戳 -->
+    <g transform="translate(150 200) rotate(-15)">
+      <circle cx="0" cy="0" r="32" fill="none" stroke="#8a3a2a" stroke-width="1.5" opacity="0.6"/>
+      <text x="0" y="3" text-anchor="middle" fill="#8a3a2a" font-family="serif" font-size="9" letter-spacing="2" opacity="0.75">未 送 达</text>
+    </g>
+  </g>
+
+  <text x="200" y="430" text-anchor="middle" fill="#d8c89a" opacity="0.7" font-family="serif" font-size="16" letter-spacing="6">信 · 一封从未寄出的</text>
+  <text x="200" y="455" text-anchor="middle" fill="#7a8a9a" opacity="0.6" font-family="serif" font-size="11" letter-spacing="2">THE LETTER · PLACEHOLDER</text>
+</svg>

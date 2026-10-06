@@ -1,0 +1,13 @@
+# Vercel 部署时排除的目录/文件
+node_modules/
+.git/
+.playwright-cli/
+shots/
+scripts/convert-ply-to-ksplat.cjs
+scripts/_screenshot.js
+CHANGELOG.md
+CHANGELOG-2026-10-04.md
+*.log
+.DS_Store
+Thumbs.db
+*.bak

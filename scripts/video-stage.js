@@ -1,0 +1,282 @@
+/* ============================================================
+   回声之间 · 视频调度器
+   统一管理 4 段视频（A/B/C + 长椅短片）
+   ============================================================ */
+
+(function (root) {
+  'use strict';
+  root.Echo = root.Echo || {};
+
+  /**
+   * 检查视频文件是否能加载（HEAD 请求）
+   */
+  async function videoExists(url) {
+    try {
+      const res = await fetch(url, { method: 'HEAD' });
+      return res.ok;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  root.Echo.VideoStage = {
+    // 8 个视频源配置（含钩子、3 段短片、写信背景、长椅、海边纸条、彩蛋）
+    config: {
+      hook:      { selector: '#videoHook',     src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BC%80%E5%A4%B4-27%E7%A7%92.mp4',         contentEnd: 26.5, label: '前情' },
+      shortA:    { selector: '#videoA',        src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BC%80%E7%AE%B1-29.mp4',           contentEnd: 28.5, label: '《没有出发的星期日》' },
+      shortB:    { selector: '#videoB',        src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/ai%E9%AA%8C%E7%AE%97.mp4',            contentEnd: 19.5, label: '《想象中的抵达》' },
+      shortC:    { selector: '#videoC',        src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E7%A9%BA%E6%A4%85%E5%AD%90.mp4',            contentEnd: 2.5,  label: '《带你认识他》' },
+      letterBg:  { selector: '#letterBgVideo', src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E7%A9%BA%E6%A4%85%E5%AD%90.mp4',            /* 写信背景循环，无结束卡 */ },
+      bench:     { selector: '#benchPlayer',   src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E9%99%88%E9%BB%98%E7%9A%84%E5%9B%9E%E4%BF%A1-14.mp4',     contentEnd: 14,   label: '陈默的回信' },
+      seaNote:   { selector: '#benchPlayer',   src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E9%99%88%E9%BB%98%E4%B8%8E%E5%A5%B3%E5%84%BF.mp4',        contentEnd: 23,   label: '陈默与女儿' },
+      easter:    { selector: '#easterPlayer',  src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BD%A9%E8%9B%8B.mp4',              contentEnd: 19.5, label: '彩蛋' }
+    },
+
+    // 缓存每个视频的可用性检查结果
+    _availability: {},
+
+    // 音频是否已被用户解锁（任意点击触发，由 installAudioUnlock 设置）
+    _audioUnlocked: false,
+
+    /**
+     * 预检查所有视频可用性（在页面加载时调用，避免运行时 HEAD 延迟）
+     */
+    async preflight() {
+      const checks = Object.keys(this.config).map(async (key) => {
+        await this.checkAvailability(key);
+      });
+      await Promise.all(checks);
+      console.log('[VideoStage] preflight complete:', this._availability);
+    },
+
+    /**
+     * 异步检查某段视频是否可用
+     */
+    async checkAvailability(key) {
+      if (this._availability[key] !== undefined) return this._availability[key];
+      const cfg = this.config[key];
+      if (!cfg) return false;
+      const ok = await videoExists(cfg.src);
+      this._availability[key] = ok;
+      return ok;
+    },
+
+    /**
+     * 同步获取某段视频的可用性（仅在 checkAvailability 之后）
+     */
+    isAvailable(key) {
+      return this._availability[key] === true;
+    },
+
+    /**
+     * 播放某段视频
+     * - 如果视频文件存在：正常播放
+     * - 如果不存在：显示"（视频暂未提供）"占位卡 + 跳过按钮
+     */
+    async play(key) {
+      const cfg = this.config[key];
+      if (!cfg) return;
+
+      // 如果预检查已完成，同步获取；否则 HEAD 一次
+      let available = this._availability[key];
+      if (available === undefined) {
+        available = await this.checkAvailability(key);
+      }
+      const player = document.querySelector(cfg.selector);
+      const endBox = this._findEndBox(key);
+
+      if (!available) {
+        // 显示占位卡
+        this._showPlaceholder(key, endBox);
+        return;
+      }
+
+      // 视频可用，正常播放
+      this._hidePlaceholder(key, endBox);
+      if (player) {
+        // 只有在视频不在播放时（end 已显示或暂停）才重置 currentTime
+        // 避免 HEAD 延迟回包后把用户正在看的视频重置回 0
+        const endBoxActive = endBox && endBox.classList.contains('is-active');
+        const wasPlaying = !player.paused && player.currentTime > 0;
+        if (!wasPlaying && !endBoxActive) {
+          try { player.currentTime = 0; } catch (_) {}
+        }
+
+        // 视频开始播放：延迟 1.2s 再 duckBGM（让用户先听到 BGM）
+        // 这样用户点击章节进入按钮后，会先听到 1.2 秒的背景音乐，再淡出
+        if (window.Echo && typeof window.Echo.duckBGM === 'function') {
+          setTimeout(() => {
+            // 再次检查：如果视频已经结束/跳过了，不要再 duck
+            if (!player.ended && !player.paused) {
+              window.Echo.duckBGM();
+            }
+          }, 1200);
+        }
+
+        try {
+          // 音频解锁后再尝试有声（installAudioUnlock 会设置 _audioUnlocked）
+          player.muted = !!this._audioUnlocked ? false : true;
+          await player.play();
+          // 播放成功：自动隐藏播放层（caption + badge 也一起淡出）
+          const wrap = player.closest('.video__wrap');
+          const overlay = wrap ? wrap.querySelector('.video__overlay') : null;
+          if (overlay) overlay.classList.add('is-hidden');
+        } catch (err) {
+          // 浏览器拒绝 unmute autoplay 时降级为静音播放
+          console.warn(`[VideoStage] ${key} unmute play failed, fallback to muted:`, err && err.name);
+          try {
+            player.muted = true;
+            await player.play();
+            const wrap = player.closest('.video__wrap');
+            const overlay = wrap ? wrap.querySelector('.video__overlay') : null;
+            if (overlay) overlay.classList.add('is-hidden');
+          } catch (e) {
+            console.warn(`[VideoStage] ${key} muted play also failed:`, e);
+          }
+        }
+
+        // 兜底：如果内容时长比 contentEnd 还短（比如视频不到 122s），
+        // 就靠 ended 事件显示结束卡
+        let endShown = endBoxActive; // 如果已经显示过了就不重复触发
+        const showEndOnce = () => {
+          if (endShown) return;
+          endShown = true;
+          try { player.pause(); } catch (_) {}
+          this.showEnd(key);
+          player.removeEventListener('timeupdate', onTimeUpdate);
+          // 视频结束：BGM 恢复
+          if (window.Echo && typeof window.Echo.resumeBGM === 'function') {
+            window.Echo.resumeBGM();
+          }
+        };
+
+        // 监听 timeupdate，跳过片尾黑场
+        const onTimeUpdate = () => {
+          if (player.currentTime >= cfg.contentEnd) {
+            showEndOnce();
+          }
+        };
+        player.addEventListener('timeupdate', onTimeUpdate);
+
+        // 监听 ended（视频自然结束时）
+        player.addEventListener('ended', showEndOnce, { once: true });
+      }
+    },
+
+    /**
+     * 循环播放某段视频（用于背景视频，不挂结束监听器）
+     * - 调用前请确保 video 元素已设置了 muted loop 属性
+     * - 失败时降级为 muted 重试
+     */
+    async playLoop(key) {
+      const cfg = this.config[key];
+      if (!cfg) return;
+      const available = await this.checkAvailability(key);
+      if (!available) {
+        console.log(`[VideoStage] ${key}: video unavailable, loop skipped`);
+        return;
+      }
+      const player = document.querySelector(cfg.selector);
+      if (!player) return;
+      try {
+        player.currentTime = 0;
+        await player.play();
+      } catch (err) {
+        console.warn(`[VideoStage] ${key} loop play failed:`, err);
+        try { await player.play(); } catch (_) {}
+      }
+    },
+
+    /**
+     * 暂停某段视频（用于离开背景视频章节时）
+     */
+    pauseLoop(key) {
+      const cfg = this.config[key];
+      if (!cfg) return;
+      const player = document.querySelector(cfg.selector);
+      if (player) {
+        try { player.pause(); } catch (_) {}
+      }
+    },
+
+    /**
+     * 查找视频章节对应的结束卡 DOM
+     */
+    _findEndBox(key) {
+      const chapterMap = {
+        hook:    '#chapter-hook',
+        shortA:  '#chapter-3',
+        shortB:  '#chapter-6',
+        shortC:  '#chapter-8',
+        bench:   '#seaOverlay',
+        seaNote: '#seaOverlay',
+        easter:  '#easterOverlay'
+      };
+      const scope = document.querySelector(chapterMap[key]);
+      return scope ? scope.querySelector('.video__end, .sea-overlay__end, .easter-overlay__end') : null;
+    },
+
+    /**
+     * 显示占位卡（视频不可用时）
+     */
+    _showPlaceholder(key, endBox) {
+      if (!endBox) return;
+      endBox.classList.add('is-active');
+      endBox.dataset.videoKey = key;
+      console.log(`[VideoStage] ${key}: video unavailable, showing placeholder`);
+    },
+
+    /**
+     * 隐藏占位卡
+     */
+    _hidePlaceholder(key, endBox) {
+      if (!endBox) return;
+      endBox.classList.remove('is-active');
+    },
+
+    /**
+     * 显示结束卡
+     */
+    showEnd(key) {
+      const endBox = this._findEndBox(key);
+      if (endBox) endBox.classList.add('is-active');
+    },
+
+    /**
+     * 隐藏结束卡
+     */
+    hideEnd(key) {
+      const endBox = this._findEndBox(key);
+      if (endBox) endBox.classList.remove('is-active');
+    },
+
+    /**
+     * 停止所有视频并重置
+     */
+    stopAll() {
+      Object.values(this.config).forEach(cfg => {
+        const player = document.querySelector(cfg.selector);
+        if (player) {
+          try {
+            player.pause();
+            player.currentTime = 0;
+          } catch (_) {}
+        }
+      });
+    },
+
+    /**
+     * 重置某段视频并隐藏其结束卡
+     */
+    reset(key) {
+      const cfg = this.config[key];
+      if (!cfg) return;
+      const player = document.querySelector(cfg.selector);
+      if (player) {
+        try { player.pause(); player.currentTime = 0; } catch (_) {}
+      }
+      this.hideEnd(key);
+    }
+  };
+
+})(window);
