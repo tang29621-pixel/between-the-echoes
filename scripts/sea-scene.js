@@ -234,15 +234,34 @@
           };
           player.addEventListener('error', onLoadError, { once: true });
 
+          // ★ 音频：用户首次点击已经解锁了 audio，可以有声播放；
+          //   没解锁过则保持 muted（避免 autoplay 政策拦截）
+          const audioUnlocked = !!(VS && VS._audioUnlocked);
+          player.muted = !audioUnlocked;
+
           try {
             player.currentTime = 0;
             player.play();
           } catch (e) { console.warn('[SeaScene] overlay play failed:', e); }
 
-          // 监听结束，显示"再看一次"按钮
+          // ★ 延迟 1.2s 让 BGM 淡出（让用户先听到视频自己的声音 1.2 秒）
+          //   不调 duckBGM 的话 BGM 会跟视频混在一起，听感是「卡」
+          if (audioUnlocked && window.Echo && typeof window.Echo.duckBGM === 'function') {
+            setTimeout(() => {
+              if (!player.ended && !player.paused) {
+                window.Echo.duckBGM();
+              }
+            }, 1200);
+          }
+
+          // 监听结束，显示"再看一次"按钮 + BGM 恢复
           player.addEventListener('ended', () => {
             const replay = overlay.querySelector('.sea-overlay__replay');
             if (replay) replay.hidden = false;
+            // ★ 视频结束：BGM 恢复
+            if (audioUnlocked && window.Echo && typeof window.Echo.resumeBGM === 'function') {
+              window.Echo.resumeBGM();
+            }
           }, { once: true });
         } else {
           // 都不可用：填占位文案 + 显示
@@ -266,6 +285,10 @@
         if (player) { try { player.pause(); player.currentTime = 0; } catch (_) {} }
         const replay = overlay.querySelector('.sea-overlay__replay');
         if (replay) replay.hidden = true;
+        // ★ 主动关闭时也恢复 BGM（避免中途关掉浮层后 BGM 一直 0）
+        if (window.Echo && typeof window.Echo.resumeBGM === 'function') {
+          window.Echo.resumeBGM();
+        }
       }, 400);
     },
 

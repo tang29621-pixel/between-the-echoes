@@ -2115,6 +2115,98 @@ img {
   margin: 0;
   font-family: 'Courier New', monospace;
 }
+/* 下载进度条（model-viewer 的 progress 事件触发） */
+.model-loading__progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(280px, 80%);
+  margin: 0;
+}
+.model-loading__progress-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(216, 200, 154, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.model-loading__progress-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #d8c89a 0%, #e8d8aa 100%);
+  border-radius: 2px;
+  transition: width 0.2s ease;
+}
+.model-loading__progress-pct {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #d8c89a;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* archive 章节里 item 卡片上的加载状态（替代 model-viewer 的默认 poster） */
+.archive-model-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  color: rgba(216, 200, 154, 0.7);
+  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+  background: rgba(8, 12, 16, 0.4);
+  border-radius: 8px;
+}
+.archive-model-loading__spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(216, 200, 154, 0.2);
+  border-top-color: #d8c89a;
+  border-radius: 50%;
+  animation: model-loading-spin 0.9s linear infinite;
+}
+.archive-model-loading__text {
+  font-size: 13px;
+  letter-spacing: 3px;
+  margin: 0;
+}
+.archive-model-loading__progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(220px, 70%);
+}
+.archive-model-loading__bar {
+  flex: 1;
+  height: 3px;
+  background: rgba(216, 200, 154, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.archive-model-loading__fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #d8c89a 0%, #e8d8aa 100%);
+  border-radius: 2px;
+  transition: width 0.2s ease;
+}
+.archive-model-loading__pct {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #d8c89a;
+  min-width: 32px;
+  text-align: right;
+}
+.archive-model-loading--error .archive-model-loading__text {
+  color: rgba(220, 120, 120, 0.9);
+}
 
 .model-placeholder {
   width: 100%;

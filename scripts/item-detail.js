@@ -56,9 +56,13 @@
       if (modelContainer) {
         modelContainer.innerHTML = `
           <div class="model-loading" data-model-loading>
-            <div class="model-loading__spinner"></div>
-            <p class="model-loading__text">正在加载 3D 模型…</p>
-            <p class="model-loading__hint">${itemKey}.glb · 首次加载约 5-10 秒</p>
+            <div class="model-loading__spinner" data-model-spinner></div>
+            <p class="model-loading__text" data-model-text>正在加载 3D 模型…</p>
+            <p class="model-loading__progress" data-model-progress style="display:none;">
+              <span class="model-loading__progress-bar"><span class="model-loading__progress-fill" data-model-progress-fill></span></span>
+              <span class="model-loading__progress-pct" data-model-progress-pct>0%</span>
+            </p>
+            <p class="model-loading__hint">${itemKey}.glb · 首次加载约 5-10 秒 · 之后秒出</p>
           </div>
         `;
 
@@ -80,10 +84,34 @@
           mv.style.opacity = '0';
           mv.style.transition = 'opacity 0.6s ease';
 
+          // 实时进度：model-viewer 在下载过程中会触发 progress 事件
+          // detail = { total, loaded }（字节数）
+          const progressEl = modelContainer.querySelector('[data-model-progress]');
+          const progressFill = modelContainer.querySelector('[data-model-progress-fill]');
+          const progressPct = modelContainer.querySelector('[data-model-progress-pct]');
+          const progressText = modelContainer.querySelector('[data-model-text]');
+          const spinner = modelContainer.querySelector('[data-model-spinner]');
+          const onProgress = (e) => {
+            const total = e.detail && e.detail.total;
+            const loaded = e.detail && e.detail.loaded;
+            if (total && loaded != null && total > 0) {
+              const pct = Math.min(100, Math.round((loaded / total) * 100));
+              if (progressEl) progressEl.style.display = '';
+              if (progressFill) progressFill.style.width = pct + '%';
+              if (progressPct) progressPct.textContent = pct + '%';
+              // 大于 50% 时文案变「即将完成…」
+              if (progressText && pct >= 50 && pct < 100) {
+                progressText.textContent = '即将完成…';
+              }
+            }
+          };
+          mv.addEventListener('progress', onProgress);
+
           mv.addEventListener('load', () => {
             mv.style.opacity = '1';
             const loading = modelContainer.querySelector('[data-model-loading]');
             if (loading) loading.style.display = 'none';
+            mv.removeEventListener('progress', onProgress);
           }, { once: true });
 
           mv.addEventListener('error', () => {
@@ -94,6 +122,7 @@
                 <p class="model-placeholder__hint">模型暂不可用 · 静态预览</p>
               </div>
             `;
+            mv.removeEventListener('progress', onProgress);
           }, { once: true });
 
           modelContainer.appendChild(mv);

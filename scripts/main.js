@@ -550,10 +550,48 @@
       // 默认先隐藏，加载完再淡入（避免贴图闪烁）
       mv.style.opacity = '0';
       mv.style.transition = 'opacity 0.5s ease';
-      mv.addEventListener('load', () => { mv.style.opacity = '1'; }, { once: true });
-      ph.replaceWith(mv);
+
+      // 进度提示：把当前 item 替换成「加载中」overlay，下载完再替换回 model-viewer
+      // 这样用户在 archive 也能看到下载进度
+      const itemKey = item.dataset.item || '';
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.className = 'archive-model-loading';
+      loadingOverlay.innerHTML = `
+        <div class="archive-model-loading__spinner"></div>
+        <p class="archive-model-loading__text">正在加载 ${itemKey}…</p>
+        <div class="archive-model-loading__progress">
+          <div class="archive-model-loading__bar"><span class="archive-model-loading__fill"></span></div>
+          <span class="archive-model-loading__pct">0%</span>
+        </div>
+      `;
+      const fill = loadingOverlay.querySelector('.archive-model-loading__fill');
+      const pctEl = loadingOverlay.querySelector('.archive-model-loading__pct');
+      const textEl = loadingOverlay.querySelector('.archive-model-loading__text');
+      mv.addEventListener('progress', (e) => {
+        const total = e.detail && e.detail.total;
+        const loaded = e.detail && e.detail.loaded;
+        if (total && loaded != null && total > 0) {
+          const p = Math.min(100, Math.round((loaded / total) * 100));
+          if (fill) fill.style.width = p + '%';
+          if (pctEl) pctEl.textContent = p + '%';
+          if (textEl && p >= 50 && p < 100) textEl.textContent = '即将完成…';
+        }
+      });
+
+      mv.addEventListener('load', () => {
+        mv.style.opacity = '1';
+        if (loadingOverlay.parentNode) loadingOverlay.remove();
+        mv.removeEventListener('progress', () => {});
+      }, { once: true });
+
+      mv.addEventListener('error', () => {
+        loadingOverlay.classList.add('archive-model-loading--error');
+        if (textEl) textEl.textContent = '加载失败，请检查网络';
+      }, { once: true });
+
+      ph.replaceWith(loadingOverlay);
+      loadingOverlay.appendChild(mv);
       // 启用 model-viewer 自带的 auto-rotate：每秒 16°，延迟 300ms 立即开始
-      // （model-viewer 会在用户拖动时暂停，松手后 300ms 自动恢复旋转）
       mv.setAttribute('auto-rotate', '');
       mv.setAttribute('auto-rotate-delay', '300');
       mv.setAttribute('rotation-per-second', '16deg');
