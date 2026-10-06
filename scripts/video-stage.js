@@ -9,31 +9,41 @@
 
   /**
    * 检查视频文件是否能加载（HEAD 请求）
+   * 接受单个 URL 或 URL 列表（按顺序尝试，返回第一个可用的）
+   * 返回可用 URL；都失败返回 null
    */
-  async function videoExists(url) {
-    try {
-      const res = await fetch(url, { method: 'HEAD' });
-      return res.ok;
-    } catch (_) {
-      return false;
+  async function videoExists(urlOrList) {
+    const list = Array.isArray(urlOrList) ? urlOrList : [urlOrList];
+    for (const url of list) {
+      if (!url) continue;
+      try {
+        const res = await fetch(url, { method: 'HEAD' });
+        if (res.ok) return url;
+      } catch (_) {}
     }
+    return null;
   }
 
   root.Echo.VideoStage = {
     // 8 个视频源配置（含钩子、3 段短片、写信背景、长椅、海边纸条、彩蛋）
+    // 每个 key 都配两个 URL：src = CDN 优先；fallback = 本地兜底
+    // preflight 时按顺序 HEAD，取第一个可达的；都不可达则记 null
     config: {
-      hook:      { selector: '#videoHook',     src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BC%80%E5%A4%B4-27%E7%A7%92.mp4',         contentEnd: 26.5, label: '前情' },
-      shortA:    { selector: '#videoA',        src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BC%80%E7%AE%B1-29.mp4',           contentEnd: 28.5, label: '《没有出发的星期日》' },
-      shortB:    { selector: '#videoB',        src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/ai%E9%AA%8C%E7%AE%97.mp4',            contentEnd: 19.5, label: '《想象中的抵达》' },
-      shortC:    { selector: '#videoC',        src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E7%A9%BA%E6%A4%85%E5%AD%90.mp4',            contentEnd: 2.5,  label: '《带你认识他》' },
-      letterBg:  { selector: '#letterBgVideo', src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E7%A9%BA%E6%A4%85%E5%AD%90.mp4',            /* 写信背景循环，无结束卡 */ },
-      bench:     { selector: '#benchPlayer',   src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E9%99%88%E9%BB%98%E7%9A%84%E5%9B%9E%E4%BF%A1-14.mp4',     contentEnd: 14,   label: '陈默的回信' },
-      seaNote:   { selector: '#benchPlayer',   src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E9%99%88%E9%BB%98%E4%B8%8E%E5%A5%B3%E5%84%BF.mp4',        contentEnd: 23,   label: '陈默与女儿' },
-      easter:    { selector: '#easterPlayer',  src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BD%A9%E8%9B%8B.mp4',              contentEnd: 19.5, label: '彩蛋' }
+      hook:      { selector: '#videoHook',     src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BC%80%E5%A4%B4-27%E7%A7%92.mp4',     fallback: 'assets/video/开头-27秒.mp4',     contentEnd: 26.5, label: '前情' },
+      shortA:    { selector: '#videoA',        src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BC%80%E7%AE%B1-29.mp4',               fallback: 'assets/video/开箱-29.mp4',       contentEnd: 28.5, label: '《没有出发的星期日》' },
+      shortB:    { selector: '#videoB',        src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/ai%E9%AA%8C%E7%AE%97.mp4',                fallback: 'assets/video/ai验算.mp4',        contentEnd: 19.5, label: '《想象中的抵达》' },
+      shortC:    { selector: '#videoC',        src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E7%A9%BA%E6%A4%85%E5%AD%90.mp4',         fallback: 'assets/video/空椅子.mp4',        contentEnd: 2.5,  label: '《带你认识他》' },
+      letterBg:  { selector: '#letterBgVideo', src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E7%A9%BA%E6%A4%85%E5%AD%90.mp4',         fallback: 'assets/video/空椅子.mp4',        /* 写信背景循环，无结束卡 */ },
+      bench:     { selector: '#benchPlayer',   src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E9%99%88%E9%BB%98%E7%9A%84%E5%9B%9E%E4%BF%A1-14.mp4',  fallback: 'assets/video/陈默的回信-14.mp4',  contentEnd: 14,   label: '陈默的回信',
+                   placeholderTitle: '长椅 · 爸，我到了', placeholderBadge: 'AI 推演', placeholderColor: '#8a9ac8' },
+      seaNote:   { selector: '#benchPlayer',   src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E9%99%88%E9%BB%98%E4%B8%8E%E5%A5%B3%E5%84%BF.mp4',  fallback: 'assets/video/陈默与女儿.mp4',     contentEnd: 23,   label: '陈默与女儿',
+                   placeholderTitle: '陈默与女儿',     placeholderBadge: '本地兜底', placeholderColor: '#c8a8e0' },
+      easter:    { selector: '#easterPlayer',  src: 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BD%A9%E8%9B%8B.mp4',                fallback: 'assets/video/彩蛋.mp4',          contentEnd: 19.5, label: '彩蛋',
+                   placeholderTitle: '彩蛋 · 父亲留下的另一段记录', placeholderBadge: '本地兜底', placeholderColor: '#c8a8e0' }
     },
 
-    // 缓存每个视频的可用性检查结果
-    _availability: {},
+    // 每个 key 实际可用的 src：CDN 命中 → CDN URL；CDN 不通 → fallback URL；都不通 → null
+    _chosenSrc: {},
 
     // 音频是否已被用户解锁（任意点击触发，由 installAudioUnlock 设置）
     _audioUnlocked: false,
@@ -46,42 +56,64 @@
         await this.checkAvailability(key);
       });
       await Promise.all(checks);
-      console.log('[VideoStage] preflight complete:', this._availability);
+      // 简化输出：只显示 boolean + 命中 CDN / 本地
+      const summary = {};
+      Object.keys(this._chosenSrc).forEach(k => {
+        const url = this._chosenSrc[k];
+        summary[k] = url ? (url.startsWith('http') ? 'cdn' : 'local') : false;
+      });
+      console.log('[VideoStage] preflight complete:', summary);
     },
 
     /**
-     * 异步检查某段视频是否可用
+     * 异步检查某段视频是否可用（CDN 优先，不通则本地）
+     * 已检查过的直接返回缓存
      */
     async checkAvailability(key) {
-      if (this._availability[key] !== undefined) return this._availability[key];
+      if (this._chosenSrc[key] !== undefined) {
+        return this._chosenSrc[key] !== null;
+      }
       const cfg = this.config[key];
       if (!cfg) return false;
-      const ok = await videoExists(cfg.src);
-      this._availability[key] = ok;
-      return ok;
+      const candidates = [cfg.src, cfg.fallback].filter(Boolean);
+      const workingUrl = await videoExists(candidates);
+      this._chosenSrc[key] = workingUrl;
+      return workingUrl !== null;
     },
 
     /**
      * 同步获取某段视频的可用性（仅在 checkAvailability 之后）
      */
     isAvailable(key) {
-      return this._availability[key] === true;
+      return this._chosenSrc[key] != null;
+    },
+
+    /**
+     * 获取某段视频实际可用的 src（CDN 命中或本地兜底）
+     * 没有可用 src 时返回 null
+     */
+    getSrc(key) {
+      if (this._chosenSrc[key]) return this._chosenSrc[key];
+      const cfg = this.config[key];
+      return (cfg && cfg.src) || null;
     },
 
     /**
      * 播放某段视频
-     * - 如果视频文件存在：正常播放
-     * - 如果不存在：显示"（视频暂未提供）"占位卡 + 跳过按钮
+     * - 如果视频文件存在（CDN 或本地）：正常播放
+     * - 如果都不存在：显示占位卡 + 跳过按钮
+     * - 运行期：HEAD 通过但 GET 失败时自动切到本地兜底
      */
     async play(key) {
       const cfg = this.config[key];
       if (!cfg) return;
 
-      // 如果预检查已完成，同步获取；否则 HEAD 一次
-      let available = this._availability[key];
-      if (available === undefined) {
-        available = await this.checkAvailability(key);
+      // preflight 已经跑过则同步拿到，否则 await 一次
+      if (this._chosenSrc[key] === undefined) {
+        await this.checkAvailability(key);
       }
+      const src = this.getSrc(key);
+      const available = !!src;
       const player = document.querySelector(cfg.selector);
       const endBox = this._findEndBox(key);
 
@@ -94,6 +126,22 @@
       // 视频可用，正常播放
       this._hidePlaceholder(key, endBox);
       if (player) {
+        // 切到确认可用的 src（CDN 命中或本地兜底）
+        if (player.getAttribute('src') !== src) {
+          try { player.src = src; } catch (_) {}
+        }
+
+        // 运行期兜底：HEAD 通过但 GET 失败（CDN 突然 404 / 网络抖动）时切本地
+        const onLoadError = () => {
+          const fallback = cfg.fallback;
+          if (fallback && player.getAttribute('src') !== fallback) {
+            console.warn(`[VideoStage] ${key} src 加载失败，切本地兜底：${fallback}`);
+            try { player.src = fallback; } catch (_) {}
+            player.play().catch(() => {});
+          }
+        };
+        player.addEventListener('error', onLoadError, { once: true });
+
         // 只有在视频不在播放时（end 已显示或暂停）才重置 currentTime
         // 避免 HEAD 延迟回包后把用户正在看的视频重置回 0
         const endBoxActive = endBox && endBox.classList.contains('is-active');
@@ -171,13 +219,30 @@
     async playLoop(key) {
       const cfg = this.config[key];
       if (!cfg) return;
-      const available = await this.checkAvailability(key);
-      if (!available) {
+      if (this._chosenSrc[key] === undefined) {
+        await this.checkAvailability(key);
+      }
+      const src = this.getSrc(key);
+      if (!src) {
         console.log(`[VideoStage] ${key}: video unavailable, loop skipped`);
         return;
       }
       const player = document.querySelector(cfg.selector);
       if (!player) return;
+      // 切到确认可用的 src
+      if (player.getAttribute('src') !== src) {
+        try { player.src = src; } catch (_) {}
+      }
+      // 运行期兜底
+      const onLoadError = () => {
+        const fallback = cfg.fallback;
+        if (fallback && player.getAttribute('src') !== fallback) {
+          console.warn(`[VideoStage] ${key} loop src 失败，切本地兜底`);
+          try { player.src = fallback; } catch (_) {}
+          player.play().catch(() => {});
+        }
+      };
+      player.addEventListener('error', onLoadError, { once: true });
       try {
         player.currentTime = 0;
         await player.play();

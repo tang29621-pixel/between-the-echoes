@@ -10,17 +10,8 @@
   'use strict';
   root.Echo = root.Echo || {};
 
-  /**
-   * 检查 GLB 模型文件是否存在
-   */
-  async function modelExists(name) {
-    try {
-      const res = await fetch(`https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/${name}.glb`, { method: 'HEAD' });
-      return res.ok;
-    } catch (_) {
-      return false;
-    }
-  }
+  // 物品 key → CDN URL
+  const MODEL_BASE_URL = 'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com';
 
   root.Echo.ItemDetail = {
     _currentItem: null,
@@ -57,32 +48,56 @@
         window.Echo.SourceLabels.renderBadge(detail, sourceType);
       }
 
-      // 加载模型（或占位）
+      // 加载模型
+      // 优化：去掉 modelExists HEAD 探测（preload 已保证模型会被请求，
+      //       HEAD 探测反而会消耗一次 round-trip，且和 preload 抢 method），
+      //       直接注入 model-viewer，靠它的 load/error 事件切状态。
       const modelContainer = detail.querySelector('.item-detail__model');
       if (modelContainer) {
-        const hasGLB = await modelExists(itemKey);
-        if (hasGLB) {
-          // Phase 3 路径：model-viewer
-          // 启用 auto-rotate 让模型在用户不操作时持续自转
-          // （model-viewer 在用户拖动时会暂停旋转，松手后 300ms 自动恢复）
-          modelContainer.innerHTML = `
-            <model-viewer src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/${itemKey}.glb"
-                          camera-controls
-                          auto-rotate
-                          auto-rotate-delay="300"
-                          rotation-per-second="18deg"
-                          shadow-intensity="0.5"
-                          alt="${itemKey}"></model-viewer>
-          `;
-        } else {
-          // Phase 1 占位：SVG + 旋转动画
-          modelContainer.innerHTML = `
-            <div class="model-placeholder">
-              <img src="assets/images/item-${itemKey}.svg" alt="${itemKey}" class="model-placeholder__img">
-              <p class="model-placeholder__hint">静态预览 · 视频待接入</p>
-            </div>
-          `;
-        }
+        modelContainer.innerHTML = `
+          <div class="model-loading" data-model-loading>
+            <div class="model-loading__spinner"></div>
+            <p class="model-loading__text">正在加载 3D 模型…</p>
+            <p class="model-loading__hint">${itemKey}.glb · 首次加载约 5-10 秒</p>
+          </div>
+        `;
+
+        // 下一帧再注入 model-viewer，确保 loading 先渲染
+        requestAnimationFrame(() => {
+          const mv = document.createElement('model-viewer');
+          mv.className = 'item-detail__model-viewer';
+          mv.setAttribute('src', `${MODEL_BASE_URL}/${itemKey}.glb`);
+          mv.setAttribute('camera-controls', '');
+          mv.setAttribute('auto-rotate', '');
+          mv.setAttribute('auto-rotate-delay', '300');
+          mv.setAttribute('rotation-per-second', '18deg');
+          mv.setAttribute('shadow-intensity', '0.5');
+          mv.setAttribute('alt', itemKey);
+          // loading=eager：进 DOM 立刻下载（不靠视口触发）
+          // reveal=auto：默认即可（不要 manual，否则 model-viewer 会卡在 poster 状态不加载）
+          mv.setAttribute('loading', 'eager');
+          // 默认先透明，加载完再淡入（避免模型贴图闪一下）
+          mv.style.opacity = '0';
+          mv.style.transition = 'opacity 0.6s ease';
+
+          mv.addEventListener('load', () => {
+            mv.style.opacity = '1';
+            const loading = modelContainer.querySelector('[data-model-loading]');
+            if (loading) loading.style.display = 'none';
+          }, { once: true });
+
+          mv.addEventListener('error', () => {
+            // 模型加载失败（CDN 不可达 / 404），回退到 SVG 占位
+            modelContainer.innerHTML = `
+              <div class="model-placeholder">
+                <img src="assets/images/item-${itemKey}.svg" alt="${itemKey}" class="model-placeholder__img">
+                <p class="model-placeholder__hint">模型暂不可用 · 静态预览</p>
+              </div>
+            `;
+          }, { once: true });
+
+          modelContainer.appendChild(mv);
+        });
       }
 
       // 阻止 body 滚动

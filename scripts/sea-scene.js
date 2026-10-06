@@ -30,6 +30,7 @@
       this._hotspotState = { bench: false, 'items-cup': false, 'items-ticket': false, note: false };
       this._resetHotspots();
       // 不再启动 splat viewer（Phase 4 取消，改用照片背景）
+      // GLB 预加载已移到 main.js init() —— 页面加载就启动，不再等海边
     },
 
     /**
@@ -180,6 +181,7 @@
     /**
      * 打开海边叠加层（视频层）
      * @param {string} videoKey - 视频键名，默认 'bench'，纸条用 'seaNote'
+     * 视频由 VideoStage 统一调度：CDN 优先，本地兜底，都不通才显示占位卡
      */
     _openOverlay(videoKey = 'bench') {
       const overlay = document.querySelector('#seaOverlay');
@@ -188,36 +190,67 @@
       void overlay.offsetWidth;
       overlay.classList.add('is-active');
 
-      // 播放视频或显示占位
       const player = overlay.querySelector('#benchPlayer');
       const placeholder = overlay.querySelector('.sea-overlay__placeholder');
-      const cfg = window.Echo && window.Echo.VideoStage && window.Echo.VideoStage.config[videoKey];
-      if (cfg && player && cfg.src && player.getAttribute('src') !== cfg.src) {
-        player.setAttribute('src', cfg.src);
-      }
-      if (window.Echo && window.Echo.VideoStage) {
-        // 检查视频可用性
-        window.Echo.VideoStage.checkAvailability(videoKey).then(ok => {
-          if (ok && player) {
-            if (placeholder) placeholder.hidden = true;
-            player.hidden = false;
-            try {
-              player.currentTime = 0;
-              player.play();
-            } catch (e) { console.warn('[SeaScene] overlay play failed:', e); }
-            // 监听结束
-            player.addEventListener('ended', () => {
-              // 显示"再看一次"按钮
-              const replay = overlay.querySelector('.sea-overlay__replay');
-              if (replay) replay.hidden = false;
-            }, { once: true });
-          } else {
-            // 显示占位
-            if (placeholder) placeholder.hidden = false;
-            if (player) player.hidden = true;
+      const VS = window.Echo && window.Echo.VideoStage;
+      if (!VS) return;
+
+      // 动态填占位文案（按视频 key 取 placeholderTitle / placeholderBadge）
+      const fillPlaceholder = (cfg) => {
+        if (!placeholder || !cfg) return;
+        const titleEl = placeholder.querySelector('.sea-overlay__placeholder-title');
+        const badgeEl = placeholder.querySelector('.sea-overlay__placeholder-text .source-badge');
+        if (titleEl && cfg.placeholderTitle) titleEl.textContent = cfg.placeholderTitle;
+        if (badgeEl) {
+          if (cfg.placeholderBadge) badgeEl.textContent = cfg.placeholderBadge;
+          if (cfg.placeholderColor) {
+            badgeEl.style.color = cfg.placeholderColor;
+            badgeEl.style.borderColor = cfg.placeholderColor;
           }
-        });
-      }
+        }
+      };
+
+      VS.checkAvailability(videoKey).then(() => {
+        const ok = VS.isAvailable(videoKey);
+        const chosenSrc = VS.getSrc(videoKey);
+        const cfg = VS.config[videoKey];
+
+        if (ok && player && chosenSrc) {
+          fillPlaceholder(cfg);  // 先填文案，以防运行期兜底也失败
+          if (placeholder) placeholder.hidden = true;
+          player.hidden = false;
+          // 切到确认可用的 src（CDN 命中或本地兜底）
+          if (player.getAttribute('src') !== chosenSrc) {
+            try { player.src = chosenSrc; } catch (_) {}
+          }
+          // 运行期兜底：HEAD 通过但 GET 失败时切本地
+          const onLoadError = () => {
+            const fallback = cfg && cfg.fallback;
+            if (fallback && player.getAttribute('src') !== fallback) {
+              console.warn(`[SeaScene] ${videoKey} src 加载失败，切本地兜底`);
+              try { player.src = fallback; } catch (_) {}
+              player.play().catch(() => {});
+            }
+          };
+          player.addEventListener('error', onLoadError, { once: true });
+
+          try {
+            player.currentTime = 0;
+            player.play();
+          } catch (e) { console.warn('[SeaScene] overlay play failed:', e); }
+
+          // 监听结束，显示"再看一次"按钮
+          player.addEventListener('ended', () => {
+            const replay = overlay.querySelector('.sea-overlay__replay');
+            if (replay) replay.hidden = false;
+          }, { once: true });
+        } else {
+          // 都不可用：填占位文案 + 显示
+          fillPlaceholder(cfg);
+          if (placeholder) placeholder.hidden = false;
+          if (player) player.hidden = true;
+        }
+      });
     },
 
     /**

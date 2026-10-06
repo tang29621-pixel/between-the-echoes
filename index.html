@@ -42,7 +42,7 @@
       <div class="video__wrap">
         <button class="video__skip" data-skip="hook">跳过 →</button>
         <video class="video__player" id="videoHook"
-               src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BC%80%E5%A4%B4-27%E7%A7%92.mp4"
+               src="assets/video/开头-27秒.mp4"
                playsinline
                preload="metadata"></video>
         <div class="video__overlay" id="videoHookOverlay">
@@ -128,7 +128,7 @@
       <div class="video__wrap">
         <button class="video__skip" data-skip="shortA">跳过 →</button>
         <video class="video__player" id="videoA"
-               src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BC%80%E7%AE%B1-29.mp4"
+               src="assets/video/开箱-29.mp4"
                playsinline
                preload="metadata"></video>
         <div class="video__overlay" id="videoAOverlay">
@@ -342,7 +342,7 @@
       <div class="video__wrap">
         <button class="video__skip" data-skip="shortB">跳过 →</button>
         <video class="video__player" id="videoB"
-               src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/ai%E9%AA%8C%E7%AE%97.mp4"
+               src="assets/video/ai验算.mp4"
                playsinline
                preload="metadata"></video>
         <div class="video__overlay" id="videoBOverlay">
@@ -443,6 +443,7 @@
       </div>
 
       <!-- 全站背景音乐（用户首次点击后自动有声；视频播放时自动淡出） -->
+      <!-- 默认走 CDN；CDN 不通时由 main.js 的 bindSea 切到本地 assets/audio/sea-ambient.mp3 -->
       <audio id="bgmAudio" src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/sea-ambient.mp3" loop preload="metadata" muted></audio>
     </section>
 
@@ -451,7 +452,7 @@
       <div class="video__wrap">
         <button class="video__skip" data-skip="shortC">跳过 →</button>
         <video class="video__player" id="videoC"
-               src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E7%A9%BA%E6%A4%85%E5%AD%90.mp4"
+               src="assets/video/空椅子.mp4"
                playsinline
                preload="metadata"></video>
         <div class="video__overlay" id="videoCOverlay">
@@ -491,7 +492,7 @@
     <!-- ============ 章节 9：写一封信 ============ -->
     <section class="chapter chapter--write" id="chapter-9" data-chapter="write" hidden>
       <video class="write__bg-video" id="letterBgVideo"
-             src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E7%A9%BA%E6%A4%85%E5%AD%90.mp4"
+             src="assets/video/空椅子.mp4"
              muted loop playsinline preload="metadata"></video>
       <div class="write__wrap">
         <p class="write__prompt">此刻，你想对谁说点什么？<span class="text__en">Whom would you like to speak to?</span></p>
@@ -643,7 +644,7 @@
   <div class="sea-overlay" id="seaOverlay" hidden>
     <div class="sea-overlay__backdrop" data-close="seaOverlay"></div>
     <video class="sea-overlay__player" id="benchPlayer"
-           src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E9%99%88%E9%BB%98%E7%9A%84%E5%9B%9E%E4%BF%A1-14.mp4"
+           src="assets/video/陈默的回信-14.mp4"
            playsinline
            preload="metadata"></video>
 
@@ -666,7 +667,7 @@
   <div class="easter-overlay" id="easterOverlay" hidden>
     <div class="easter-overlay__backdrop" data-close="easterOverlay"></div>
     <video class="easter-overlay__player" id="easterPlayer"
-           src="https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/%E5%BD%A9%E8%9B%8B.mp4"
+           src="assets/video/彩蛋.mp4"
            playsinline preload="metadata"></video>
     <div class="easter-overlay__controls">
       <button class="easter-overlay__close" data-close="easterOverlay" aria-label="关闭">×</button>

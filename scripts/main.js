@@ -22,6 +22,15 @@
     }
   }
 
+  /** 在多个 URL 中取第一个 HEAD 可达的；都失败返回 null */
+  async function pickWorkingAudio(urls) {
+    for (const url of urls) {
+      if (!url) continue;
+      if (await audioExists(url)) return url;
+    }
+    return null;
+  }
+
   // ---------- 章节映射（12 段：首页 → 钩子 → 案例导览 → ...） ----------
   const CHAPTER_MAP = {
     home:        '#chapter-1',
@@ -304,25 +313,39 @@
     let ctx = null;
     let masterGain = null;
     let compressor = null;
-    const BOOST = 5.0; // 视频原始电平低（7-13%），放大 5 倍让用户能清晰听到
+    let makeUpGain = null;
+    // 视频已经 ffmpeg loudnorm 处理到 -14 LUFS（标准对白音量），所以 BOOST 1.5 倍即可
+    // （再大会削波；1 倍也可以，但 1.5 让人声更清晰一点）
+    const BOOST = 1.5;
 
     const ensureCtx = () => {
       if (!ctx) {
         const Ctx = window.AudioContext || window.webkitAudioContext;
         ctx = new Ctx();
-        // Compressor 防止峰值削波：threshold -10dB, ratio 4:1
-        // 视频放大 5x 后峰值会到 400%（削波），compressor 把它压回安全范围
+        // 强压缩：threshold -30dB（任何输入都触发），ratio 8:1
+        // 视频原始电平 7-13%（-23dB ~ -18dB），全部超过 -30dB 阈值
+        // 8:1 压缩后动态范围被极大压缩 → 听感更响
         compressor = ctx.createDynamicsCompressor();
-        compressor.threshold.value = -10;
-        compressor.knee.value = 5;
+        compressor.threshold.value = -20;
+        compressor.knee.value = 10;
         compressor.ratio.value = 4;
         compressor.attack.value = 0.003;
-        compressor.release.value = 0.25;
+        compressor.release.value = 0.1;
+        // makeup gain 补偿压缩损失
+        makeUpGain = ctx.createGain();
+        makeUpGain.gain.value = 1.0;
         masterGain = ctx.createGain();
         masterGain.gain.value = BOOST;
-        // signal → masterGain (×5) → compressor (防止削波) → destination
+        // signal → masterGain (×10) → compressor (8:1) → makeUp (×3) → destination
+        // 净增益：10 × 3 = 30 倍（但压缩后实际听感约 6-10 倍）
         masterGain.connect(compressor);
-        compressor.connect(ctx.destination);
+        compressor.connect(makeUpGain);
+        makeUpGain.connect(ctx.destination);
+        // 暴露 ctx 给调试/外部监控用
+        window.__audioBoostCtx = ctx;
+        window.__audioBoostMasterGain = masterGain;
+        window.__audioBoostCompressor = compressor;
+        window.__audioBoostMakeUpGain = makeUpGain;
       } else if (ctx.state === 'suspended') {
         ctx.resume();
       }
@@ -332,35 +355,60 @@
     // 已连接的 video 列表（避免重复创建 MediaElementSource）
     const connectedVideos = new WeakSet();
 
-    // 监听任意新加进 DOM 的 video / 已有 video 的 src 变化
-    const wireVideo = (v) => {
-      if (connectedVideos.has(v)) return;
-      // 等视频真正开始播放时再连接（需要 MediaElementSource 还没被占用）
+    // 主动连接 video 到 BOOST 链（不等 play 事件，确保 init 时就生效）
+    // 注意：MediaElementAudioSourceNode 没有 start() 方法！
+    // 音频通过 HTMLMediaElement.play() 自动流入 source。
+    const connectVideo = (v) => {
+      if (!v) return;
+      try {
+        ensureCtx();
+        const src = ctx.createMediaElementSource(v);
+        src.connect(masterGain);
+        connectedVideos.add(v);
+        if (v.id) window['__videoSource_' + v.id] = src;
+        return true;
+      } catch (e) {
+        return false;
+      }
+    };
+    // play 事件触发时再尝试一次 connect（重试）
+    const retryOnPlay = (v) => {
       v.addEventListener('play', () => {
         if (connectedVideos.has(v)) return;
-        try {
-          ensureCtx();
-          const src = ctx.createMediaElementSource(v);
-          src.connect(masterGain);
-          connectedVideos.add(v);
-        } catch (e) {
-          // 已被另一个 source 占用就跳过
-          connectedVideos.add(v);
-        }
+        connectVideo(v);
       }, { once: false });
     };
 
-    // 处理已有 video
-    document.querySelectorAll('video').forEach(wireVideo);
+    // 处理已有 video（主动连接，不等 play 事件）
+    document.querySelectorAll('video').forEach(v => {
+      connectVideo(v);
+      retryOnPlay(v);
+    });
 
-    // 处理动态加进来的 video
+    // 立即创建 audio context 并预热
+    try {
+      ensureCtx();
+    } catch (_) {}
+
+  // 处理已有 video（主动连接，不等 play 事件）
+    document.querySelectorAll('video').forEach(v => {
+      connectVideo(v);
+      retryOnPlay(v);
+    });
+
+  // 处理动态加进来的 video
     const obs = new MutationObserver((muts) => {
       muts.forEach(m => {
         m.addedNodes.forEach(n => {
           if (n.nodeType !== 1) return;
-          if (n.tagName === 'VIDEO') wireVideo(n);
-          else if (n.querySelectorAll) {
-            n.querySelectorAll('video').forEach(wireVideo);
+          if (n.tagName === 'VIDEO') {
+            connectVideo(n);
+            retryOnPlay(n);
+          } else if (n.querySelectorAll) {
+            n.querySelectorAll('video').forEach(v => {
+              connectVideo(v);
+              retryOnPlay(v);
+            });
           }
         });
       });
@@ -491,11 +539,18 @@
       mv.setAttribute('src', ph.dataset.modelSrc);
       mv.setAttribute('alt', item.dataset.item || '');
       mv.setAttribute('camera-controls', '');
+      // loading=eager：元素一进 DOM 就开始下载（不靠视口触发）
+      // 不设 reveal=manual（否则 model-viewer 会卡在 poster 不加载模型）
+      mv.setAttribute('loading', 'eager');
       // 移除 model-viewer 自带的 auto-rotate（它在鼠标悬停时会暂停）
       // 改用我们自己的 RAF 持续旋转
       mv.setAttribute('shadow-intensity', '0.6');
       mv.setAttribute('exposure', '1.1');
       mv.setAttribute('camera-orbit', '45deg 75deg 1.4m');
+      // 默认先隐藏，加载完再淡入（避免贴图闪烁）
+      mv.style.opacity = '0';
+      mv.style.transition = 'opacity 0.5s ease';
+      mv.addEventListener('load', () => { mv.style.opacity = '1'; }, { once: true });
       ph.replaceWith(mv);
       // 启用 model-viewer 自带的 auto-rotate：每秒 16°，延迟 300ms 立即开始
       // （model-viewer 会在用户拖动时暂停，松手后 300ms 自动恢复旋转）
@@ -517,9 +572,11 @@
     }
 
     // 章节进入/离开时的全量挂载/销毁
+    // 优化：进入 archive 时并行挂载所有 4 个 item，让 4 个 GLB 同时下载
+    // （之前只挂载可见的那一个，要 4 次串行下载）
     function mountAllVisible() {
-      items.forEach((it, idx) => {
-        if (!it.hidden) mountItemModel(it);
+      items.forEach((it) => {
+        mountItemModel(it);
       });
     }
     function unmountAll() {
@@ -589,11 +646,21 @@
   // ============================================================
   function bindSea() {
     // BGM 音频元素（sea-ambient.mp3）作为全站背景音乐
+    // CDN 优先，本地兜底；都不通则移除元素
     // 视频播放时由 video-stage.js 调 duckBGM() 淡出；视频结束后恢复
     const bgm = $('#bgmAudio');
     if (bgm) {
-      audioExists(bgm.getAttribute('src')).then(ok => {
-        if (!ok) bgm.remove();
+      const candidates = [
+        'https://ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com/sea-ambient.mp3',
+        'assets/audio/sea-ambient.mp3'
+      ];
+      pickWorkingAudio(candidates).then(working => {
+        if (working) {
+          try { bgm.src = working; } catch (_) {}
+          bgm.load();
+        } else {
+          bgm.remove();
+        }
       });
     }
   }
@@ -847,9 +914,53 @@
   // ============================================================
   // 初始化
   // ============================================================
+
+  /**
+   * 页面加载阶段就预连接 + 预加载 4 个 GLB 模型
+   * - preconnect：提前握手 DNS + TCP + TLS
+   * - preload：浏览器一进 idle 就开始下载（用户读首页/钩子/案例/海边的几秒钟里，模型就在后台下）
+   * - fetchpriority：第一件物品 highest（用户大概率先看它），其他 auto
+   * 之前是进入海边才预加载，太晚 —— 用户已经走到旧物档案还在等下载
+   */
+  function preload3DAssets() {
+    const CDN_HOST = 'ke1sfe0r0qdtrhdk.public.blob.vercel-storage.com';
+    const HREF = `https://${CDN_HOST}`;
+
+    // preconnect（暖连接，没有 crossorigin 时也成立）
+    if (!document.querySelector(`link[rel="preconnect"][href="${HREF}"]`)) {
+      const link = document.createElement('link');
+      link.rel = 'preconnect';
+      link.href = HREF;
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+    }
+
+    // preload 4 个 GLB（并行下载，CDN 已开启 Accept-Ranges + 30 天缓存）
+    const models = [
+      { name: 'painting', priority: 'high' }, // 第一件物品最高优先级
+      { name: 'ticket',   priority: 'auto' },
+      { name: 'cup',      priority: 'auto' },
+      { name: 'letter',   priority: 'low' }
+    ];
+    models.forEach(({ name, priority }) => {
+      const url = `${HREF}/${name}.glb`;
+      if (document.querySelector(`link[href="${url}"]`)) return;
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'fetch';
+      link.href = url;
+      link.crossOrigin = 'anonymous';
+      link.setAttribute('fetchpriority', priority);
+      document.head.appendChild(link);
+    });
+  }
+
   function init() {
     // 首页作为默认入口
     $('#chapter-1').classList.add('is-active');
+
+    // 页面加载阶段就开始暖连接 + 预加载 4 个 GLB
+    preload3DAssets();
 
     // 页面加载后尝试 muted 自动播放 BGM（Chrome 真实环境允许）
     // 在真实浏览器中会成功；headless playwright 等环境下会被拒绝，
