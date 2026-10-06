@@ -560,7 +560,8 @@
       loadingOverlay.className = 'archive-model-loading';
       loadingOverlay.innerHTML = `
         <div class="archive-model-loading__spinner"></div>
-        <p class="archive-model-loading__text">正在加载 ${itemKey}…</p>
+        <p class="archive-model-loading__text">正在加载「${itemKey}」</p>
+        <p class="archive-model-loading__hint">Draco 压缩 · 首次约 2-5s</p>
         <div class="archive-model-loading__progress">
           <div class="archive-model-loading__bar"><span class="archive-model-loading__fill"></span></div>
           <span class="archive-model-loading__pct">0%</span>
