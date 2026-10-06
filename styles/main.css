@@ -2149,15 +2149,15 @@ img {
 
 /* archive 章节里 item 卡片上的加载状态（替代 model-viewer 的默认 poster） */
 .archive-model-loading {
+  /* grid cell 默认 align-self: stretch，但 height:100% 在 grid 里要靠 min-height 撑开 */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 22px;
+  gap: 24px;
   width: 100%;
-  height: 100%;
-  min-height: 360px;
-  padding: 48px 24px;
+  min-height: 480px;
+  padding: 60px 32px;
   color: rgba(216, 200, 154, 0.75);
   font-family: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
   background:
@@ -2167,35 +2167,35 @@ img {
   border: 1px solid rgba(216, 200, 154, 0.08);
 }
 .archive-model-loading__spinner {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border: 2px solid rgba(216, 200, 154, 0.18);
   border-top-color: #d8c89a;
   border-radius: 50%;
   animation: model-loading-spin 1.1s linear infinite;
-  /* 轻微的呼吸感 */
-  filter: drop-shadow(0 0 12px rgba(216, 200, 154, 0.25));
+  filter: drop-shadow(0 0 14px rgba(216, 200, 154, 0.28));
 }
 .archive-model-loading__text {
-  font-size: 16px;
+  font-size: 17px;
   letter-spacing: 4px;
   margin: 0;
   text-align: center;
   line-height: 1.6;
+  font-weight: 500;
 }
 .archive-model-loading__hint {
   font-family: 'Courier New', monospace;
   font-size: 11px;
   letter-spacing: 1.5px;
   color: rgba(216, 200, 154, 0.4);
-  margin: -8px 0 0;
+  margin: -10px 0 0;
 }
 .archive-model-loading__progress {
   display: flex;
   align-items: center;
   gap: 14px;
   width: min(320px, 80%);
-  margin-top: 6px;
+  margin-top: 8px;
 }
 .archive-model-loading__bar {
   flex: 1;
